@@ -1,0 +1,1551 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  10pt,
+]{article}
+\title{Discrete Rolling Reserve Policies}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{A self-contained simulation study}
+\author{Sebastian E. Carbone-Vergara}
+\date{September 2026}
+
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Discrete Rolling Reserve Policies},
+  pdfauthor={Sebastian E. Carbone-Vergara},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=0.82in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{float}
+\setlength{\parskip}{0.35em}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\hypertarget{purpose-and-design}{%
+\section{Purpose and design}\label{purpose-and-design}}
+
+This report reproduces the controlled simulation study for the discrete
+rolling reserve policies. It is deliberately self-contained: the
+predictive distributions, policy functions, robust solvers, performance
+measures, figures, and checks are all generated by the code below. No
+fitted data object or external simulation output is read.
+
+There are \(N=52\) weekly review dates. At review \(n\), the liability
+has a known Gamma predictive distribution with mean \(m_n\) and
+coefficient of variation \(v_n\):
+
+\[
+L_n\mid\mathcal F_{t_n}\sim\operatorname{Gamma}(\alpha_n,\beta_n),
+\qquad
+\alpha_n=v_n^{-2},\qquad \beta_n=m_nv_n^2,
+\]
+
+where \(\beta_n\) is the scale parameter. The experiment is not intended
+to establish empirical superiority. Its purpose is to make the policy
+mechanisms observable under a known law and to measure the adequacy cost
+of reserve stability.
+
+We use \(c^o=1\) and \(c^u=3\). These are reduced-form marginal decision
+costs, so the frictionless critical probability is
+
+\[
+q=\frac{c^u}{c^o+c^u}=0.75.
+\]
+
+The corresponding buffer is therefore generated by the cost asymmetry
+rather than imposed as an external VaR constraint.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Global experiment settings. Only base R and knitr are required.}
+\NormalTok{N }\OtherTok{\textless{}{-}}\NormalTok{ 52L}
+\NormalTok{c\_over }\OtherTok{\textless{}{-}} \DecValTok{1}
+\NormalTok{c\_under }\OtherTok{\textless{}{-}} \DecValTok{3}
+\NormalTok{C\_cost }\OtherTok{\textless{}{-}}\NormalTok{ c\_over }\SpecialCharTok{+}\NormalTok{ c\_under}
+\NormalTok{q\_star }\OtherTok{\textless{}{-}}\NormalTok{ c\_under }\SpecialCharTok{/}\NormalTok{ C\_cost}
+
+\CommentTok{\# Three revision{-}cost configurations. "Balanced" is a central reference,}
+\CommentTok{\# not an estimated optimum or a universally recommended calibration.}
+\NormalTok{scenario\_spec }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Configuration =} \FunctionTok{c}\NormalTok{(}\StringTok{"Reactive"}\NormalTok{, }\StringTok{"Balanced"}\NormalTok{, }\StringTok{"Stable"}\NormalTok{),}
+  \AttributeTok{QuadraticLambda =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.25}\NormalTok{, }\FloatTok{0.75}\NormalTok{, }\FloatTok{4.00}\NormalTok{),}
+  \AttributeTok{EtaAbsolute =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.20}\NormalTok{, }\FloatTok{0.32}\NormalTok{, }\FloatTok{0.55}\NormalTok{),}
+  \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{)}
+
+\CommentTok{\# KL radii are studied separately while balanced revision costs are fixed.}
+\NormalTok{ambiguity\_spec }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Ambiguity =} \FunctionTok{c}\NormalTok{(}\StringTok{"Small"}\NormalTok{, }\StringTok{"Moderate"}\NormalTok{, }\StringTok{"Large"}\NormalTok{),}
+  \AttributeTok{Epsilon =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.005}\NormalTok{, }\FloatTok{0.080}\NormalTok{, }\FloatTok{0.250}\NormalTok{),}
+  \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{)}
+
+\FunctionTok{stopifnot}\NormalTok{(}
+\NormalTok{  q\_star }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{,}
+\NormalTok{  q\_star }\SpecialCharTok{\textless{}} \DecValTok{1}\NormalTok{,}
+  \FunctionTok{all}\NormalTok{(q\_star }\SpecialCharTok{{-}}\NormalTok{ scenario\_spec}\SpecialCharTok{$}\NormalTok{EtaAbsolute }\SpecialCharTok{/}\NormalTok{ C\_cost }\SpecialCharTok{\textgreater{}} \DecValTok{0}\NormalTok{),}
+  \FunctionTok{all}\NormalTok{(q\_star }\SpecialCharTok{+}\NormalTok{ scenario\_spec}\SpecialCharTok{$}\NormalTok{EtaAbsolute }\SpecialCharTok{/}\NormalTok{ C\_cost }\SpecialCharTok{\textless{}} \DecValTok{1}\NormalTok{)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{predictive-environment}{%
+\section{Predictive environment}\label{predictive-environment}}
+
+The mean and CV sequences are evaluated only at the 53 displayed grid
+points \(n=0,\ldots,52\). The four quarters create distinct
+environments: a relatively stable opening, an oscillatory transition, a
+pronounced middle-year reversal, and a persistent late increase. The
+policies never interpolate between weekly reviews.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Smooth transition used to construct the deterministic mean and CV sequences.}
+\NormalTok{S }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(t, center, width) \{}
+  \FloatTok{0.5} \SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{+} \FunctionTok{tanh}\NormalTok{((t }\SpecialCharTok{{-}}\NormalTok{ center) }\SpecialCharTok{/}\NormalTok{ width))}
+\NormalTok{\}}
+
+\NormalTok{mean\_liability }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(t) \{}
+\NormalTok{  early\_level }\OtherTok{\textless{}{-}} \DecValTok{8} \SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.22}\NormalTok{, }\FloatTok{0.07}\NormalTok{))}
+\NormalTok{  small\_oscillation }\OtherTok{\textless{}{-}}
+    \FloatTok{1.20} \SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(}\DecValTok{14} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ t) }\SpecialCharTok{+}
+    \FloatTok{0.70} \SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(}\DecValTok{24} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ t }\SpecialCharTok{+} \FloatTok{0.25}\NormalTok{) }\SpecialCharTok{+}
+    \FloatTok{0.45} \SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(}\DecValTok{34} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ t }\SpecialCharTok{+} \FloatTok{0.60}\NormalTok{)}
+
+\NormalTok{  middle\_window }\OtherTok{\textless{}{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.27}\NormalTok{, }\FloatTok{0.035}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.66}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\NormalTok{  middle\_movement }\OtherTok{\textless{}{-}}\NormalTok{ middle\_window }\SpecialCharTok{*}\NormalTok{ (}
+    \FloatTok{8.5} \SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(}\DecValTok{8} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ (t }\SpecialCharTok{{-}} \FloatTok{0.25}\NormalTok{)) }\SpecialCharTok{+}
+    \FloatTok{3.2} \SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(}\DecValTok{18} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ (t }\SpecialCharTok{{-}} \FloatTok{0.25}\NormalTok{))}
+\NormalTok{  )}
+
+\NormalTok{  recovery }\OtherTok{\textless{}{-}}
+    \FloatTok{3.2} \SpecialCharTok{*} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.62}\NormalTok{, }\FloatTok{0.045}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.78}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\NormalTok{  late\_trend }\OtherTok{\textless{}{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.73}\NormalTok{, }\FloatTok{0.05}\NormalTok{) }\SpecialCharTok{*} \DecValTok{24} \SpecialCharTok{*}\NormalTok{ (t }\SpecialCharTok{{-}} \FloatTok{0.73}\NormalTok{) }\SpecialCharTok{/} \FloatTok{0.27}
+
+  \DecValTok{100} \SpecialCharTok{+}\NormalTok{ early\_level }\SpecialCharTok{+}\NormalTok{ small\_oscillation }\SpecialCharTok{+}\NormalTok{ middle\_movement }\SpecialCharTok{+}
+\NormalTok{    recovery }\SpecialCharTok{+}\NormalTok{ late\_trend}
+\NormalTok{\}}
+
+\NormalTok{liability\_cv }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(t) \{}
+\NormalTok{  middle\_window }\OtherTok{\textless{}{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.25}\NormalTok{, }\FloatTok{0.035}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.66}\NormalTok{, }\FloatTok{0.05}\NormalTok{))}
+\NormalTok{  late\_level }\OtherTok{\textless{}{-}} \FunctionTok{S}\NormalTok{(t, }\FloatTok{0.72}\NormalTok{, }\FloatTok{0.05}\NormalTok{)}
+\NormalTok{  local\_movement }\OtherTok{\textless{}{-}}
+    \FloatTok{0.008} \SpecialCharTok{*} \FunctionTok{sin}\NormalTok{(}\DecValTok{10} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ t }\SpecialCharTok{+} \FloatTok{0.4}\NormalTok{) }\SpecialCharTok{+}
+    \FloatTok{0.003} \SpecialCharTok{*} \FunctionTok{cos}\NormalTok{(}\DecValTok{18} \SpecialCharTok{*}\NormalTok{ pi }\SpecialCharTok{*}\NormalTok{ t)}
+
+  \FunctionTok{pmax}\NormalTok{(}
+    \FloatTok{0.060} \SpecialCharTok{+} \FloatTok{0.100} \SpecialCharTok{*}\NormalTok{ middle\_window }\SpecialCharTok{+} \FloatTok{0.030} \SpecialCharTok{*}\NormalTok{ late\_level }\SpecialCharTok{+}
+\NormalTok{      local\_movement,}
+    \FloatTok{0.045}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{make\_input }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}\AttributeTok{cv\_multiplier =} \DecValTok{1}\NormalTok{) \{}
+\NormalTok{  week }\OtherTok{\textless{}{-}} \DecValTok{0}\SpecialCharTok{:}\NormalTok{N}
+\NormalTok{  time }\OtherTok{\textless{}{-}}\NormalTok{ week }\SpecialCharTok{/}\NormalTok{ N}
+\NormalTok{  mean }\OtherTok{\textless{}{-}} \FunctionTok{mean\_liability}\NormalTok{(time)}
+\NormalTok{  cv }\OtherTok{\textless{}{-}}\NormalTok{ cv\_multiplier }\SpecialCharTok{*} \FunctionTok{liability\_cv}\NormalTok{(time)}
+\NormalTok{  shape }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{  scale }\OtherTok{\textless{}{-}}\NormalTok{ mean }\SpecialCharTok{*}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{week =}\NormalTok{ week,}
+    \AttributeTok{time =}\NormalTok{ time,}
+    \AttributeTok{decision =} \DecValTok{2}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(week),}
+    \AttributeTok{mean =}\NormalTok{ mean,}
+    \AttributeTok{cv =}\NormalTok{ cv,}
+    \AttributeTok{shape =}\NormalTok{ shape,}
+    \AttributeTok{scale =}\NormalTok{ scale,}
+    \AttributeTok{frictionless =} \FunctionTok{qgamma}\NormalTok{(q\_star, }\AttributeTok{shape =}\NormalTok{ shape, }\AttributeTok{scale =}\NormalTok{ scale),}
+    \AttributeTok{cv\_multiplier =}\NormalTok{ cv\_multiplier}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{input }\OtherTok{\textless{}{-}} \FunctionTok{make\_input}\NormalTok{()}
+\NormalTok{input}\SpecialCharTok{$}\NormalTok{initial }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{frictionless[1L]}
+\end{Highlighting}
+\end{Shaded}
+
+The next helpers evaluate the predictive CDF, its inverse, and the exact
+expected asymmetric adequacy cost. For a Gamma variable, the truncated
+first moment is available through a Gamma CDF with shape increased by
+one; Monte Carlo is not needed for the performance calculations.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cdf\_at }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(reserve, input) \{}
+  \FunctionTok{pgamma}\NormalTok{(reserve, }\AttributeTok{shape =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{shape, }\AttributeTok{scale =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{scale)}
+\NormalTok{\}}
+
+\NormalTok{quantile\_at }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(probability, input) \{}
+  \FunctionTok{qgamma}\NormalTok{(probability, }\AttributeTok{shape =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{shape, }\AttributeTok{scale =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{scale)}
+\NormalTok{\}}
+
+\NormalTok{expected\_adequacy }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(reserve, input) \{}
+\NormalTok{  probability }\OtherTok{\textless{}{-}} \FunctionTok{cdf\_at}\NormalTok{(reserve, input)}
+\NormalTok{  truncated\_mean }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean }\SpecialCharTok{*} \FunctionTok{pgamma}\NormalTok{(}
+\NormalTok{    reserve,}
+    \AttributeTok{shape =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{shape }\SpecialCharTok{+} \DecValTok{1}\NormalTok{,}
+    \AttributeTok{scale =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{scale}
+\NormalTok{  )}
+
+\NormalTok{  expected\_over }\OtherTok{\textless{}{-}}\NormalTok{ reserve }\SpecialCharTok{*}\NormalTok{ probability }\SpecialCharTok{{-}}\NormalTok{ truncated\_mean}
+\NormalTok{  expected\_under }\OtherTok{\textless{}{-}}
+\NormalTok{    input}\SpecialCharTok{$}\NormalTok{mean }\SpecialCharTok{{-}}\NormalTok{ truncated\_mean }\SpecialCharTok{{-}}\NormalTok{ reserve }\SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ probability)}
+
+\NormalTok{  c\_over }\SpecialCharTok{*}\NormalTok{ expected\_over }\SpecialCharTok{+}\NormalTok{ c\_under }\SpecialCharTok{*}\NormalTok{ expected\_under}
+\NormalTok{\}}
+
+\CommentTok{\# One smooth, serially correlated Gamma{-}marginal realization is included only}
+\CommentTok{\# as a visual scale reference. It is not used to calculate any policy or metric.}
+\NormalTok{simulate\_gamma\_path }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(input, }\AttributeTok{seed =}\NormalTok{ 13782L, }\AttributeTok{rho =} \FloatTok{0.98}\NormalTok{) \{}
+  \FunctionTok{set.seed}\NormalTok{(seed)}
+\NormalTok{  latent }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+\NormalTok{  latent[1L] }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(1L)}
+\NormalTok{  innovations }\OtherTok{\textless{}{-}} \FunctionTok{rnorm}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week) }\SpecialCharTok{{-}}\NormalTok{ 1L)}
+
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{2}\SpecialCharTok{:}\FunctionTok{length}\NormalTok{(latent)) \{}
+\NormalTok{    latent[i] }\OtherTok{\textless{}{-}}\NormalTok{ rho }\SpecialCharTok{*}\NormalTok{ latent[i }\SpecialCharTok{{-}}\NormalTok{ 1L] }\SpecialCharTok{+}
+      \FunctionTok{sqrt}\NormalTok{(}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ rho}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ innovations[i }\SpecialCharTok{{-}}\NormalTok{ 1L]}
+\NormalTok{  \}}
+
+\NormalTok{  probabilities }\OtherTok{\textless{}{-}} \FunctionTok{pmin}\NormalTok{(}\FunctionTok{pmax}\NormalTok{(}\FunctionTok{pnorm}\NormalTok{(latent), }\FloatTok{1e{-}10}\NormalTok{), }\DecValTok{1} \SpecialCharTok{{-}} \FloatTok{1e{-}10}\NormalTok{)}
+  \FunctionTok{qgamma}\NormalTok{(}
+\NormalTok{    probabilities,}
+    \AttributeTok{shape =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{shape,}
+    \AttributeTok{scale =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{scale}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{simulated\_liability }\OtherTok{\textless{}{-}} \FunctionTok{simulate\_gamma\_path}\NormalTok{(input)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{nominal-rolling-policies}{%
+\section{Nominal rolling policies}\label{nominal-rolling-policies}}
+
+\hypertarget{frictionless-rule}{%
+\subsection{Frictionless rule}\label{frictionless-rule}}
+
+Without revision costs, the reserve at week \(n\) is simply
+
+\[
+Q_n=F_n^{-1}(q).
+\]
+
+This is already stored as \texttt{input\$frictionless}.
+
+\hypertarget{quadratic-proportional-adjustment-rule}{%
+\subsection{Quadratic proportional-adjustment
+rule}\label{quadratic-proportional-adjustment-rule}}
+
+For a quadratic penalty, we set
+
+\[
+\eta^{(2)}=\lambda(c^o+c^u)R_0.
+\]
+
+Given the previous reserve, the new reserve is the scalar root of
+
+\[
+(c^o+c^u)F_n(r)-c^u+
+2\eta^{(2)}\frac{r-R_{n-1}}{R_{n-1}^2}=0.
+\]
+
+Convexity places the root between the previous reserve and the current
+frictionless reserve. This gives a stable numerical bracket and makes
+the code particularly transparent.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{quadratic\_policy }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(lambda, input) \{}
+\NormalTok{  eta }\OtherTok{\textless{}{-}}\NormalTok{ lambda }\SpecialCharTok{*}\NormalTok{ C\_cost }\SpecialCharTok{*}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{  reserve }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+\NormalTok{  reserve[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{  residual\_at\_solution }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{decision) \{}
+\NormalTok{    previous }\OtherTok{\textless{}{-}}\NormalTok{ reserve[i }\SpecialCharTok{{-}}\NormalTok{ 1L]}
+\NormalTok{    frictionless }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{frictionless[i]}
+
+    \CommentTok{\# First{-}order condition at the current week.}
+\NormalTok{    residual }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(r) \{}
+\NormalTok{      C\_cost }\SpecialCharTok{*} \FunctionTok{pgamma}\NormalTok{(}
+\NormalTok{        r,}
+        \AttributeTok{shape =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{shape[i],}
+        \AttributeTok{scale =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{scale[i]}
+\NormalTok{      ) }\SpecialCharTok{{-}}\NormalTok{ c\_under }\SpecialCharTok{+}
+        \DecValTok{2} \SpecialCharTok{*}\NormalTok{ eta }\SpecialCharTok{*}\NormalTok{ (r }\SpecialCharTok{{-}}\NormalTok{ previous) }\SpecialCharTok{/}\NormalTok{ previous}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{    \}}
+
+\NormalTok{    bracket }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(}\FunctionTok{c}\NormalTok{(previous, frictionless))}
+    \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{diff}\NormalTok{(bracket) }\SpecialCharTok{\textless{}=} \FloatTok{1e{-}12} \SpecialCharTok{*} \FunctionTok{max}\NormalTok{(}\DecValTok{1}\NormalTok{, bracket[2L])) \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ frictionless}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}} \FunctionTok{uniroot}\NormalTok{(}
+\NormalTok{        residual,}
+        \AttributeTok{interval =}\NormalTok{ bracket,}
+        \AttributeTok{tol =} \FloatTok{1e{-}11}
+\NormalTok{      )}\SpecialCharTok{$}\NormalTok{root}
+\NormalTok{    \}}
+\NormalTok{    residual\_at\_solution[i] }\OtherTok{\textless{}{-}} \FunctionTok{residual}\NormalTok{(reserve[i])}
+\NormalTok{  \}}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{reserve =}\NormalTok{ reserve,}
+    \AttributeTok{eta =}\NormalTok{ eta,}
+    \AttributeTok{max\_foc\_error =} \FunctionTok{max}\NormalTok{(}
+      \FunctionTok{abs}\NormalTok{(residual\_at\_solution[input}\SpecialCharTok{$}\NormalTok{decision])}
+\NormalTok{    )}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{absolute-value-rule}{%
+\subsection{Absolute-value rule}\label{absolute-value-rule}}
+
+For a penalty \(\eta^{(1)}|r-R_{n-1}|\), define
+
+\[
+A_n=F_n^{-1}\!\left(q-\frac{\eta^{(1)}}{c^o+c^u}\right),
+\qquad
+B_n=F_n^{-1}\!\left(q+\frac{\eta^{(1)}}{c^o+c^u}\right).
+\]
+
+The previous reserve is kept when it lies inside \([A_n,B_n]\);
+otherwise it is projected to the nearest boundary. The band is symmetric
+in probability space, but it need not be symmetric in reserve units.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{absolute\_policy }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(eta, input) \{}
+\NormalTok{  lower\_probability }\OtherTok{\textless{}{-}}\NormalTok{ q\_star }\SpecialCharTok{{-}}\NormalTok{ eta }\SpecialCharTok{/}\NormalTok{ C\_cost}
+\NormalTok{  upper\_probability }\OtherTok{\textless{}{-}}\NormalTok{ q\_star }\SpecialCharTok{+}\NormalTok{ eta }\SpecialCharTok{/}\NormalTok{ C\_cost}
+\NormalTok{  lower }\OtherTok{\textless{}{-}} \FunctionTok{quantile\_at}\NormalTok{(lower\_probability, input)}
+\NormalTok{  upper }\OtherTok{\textless{}{-}} \FunctionTok{quantile\_at}\NormalTok{(upper\_probability, input)}
+
+\NormalTok{  reserve }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+\NormalTok{  reserve[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{  action }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\StringTok{"Initial"}\NormalTok{, }\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{decision) \{}
+\NormalTok{    previous }\OtherTok{\textless{}{-}}\NormalTok{ reserve[i }\SpecialCharTok{{-}}\NormalTok{ 1L]}
+
+    \ControlFlowTok{if}\NormalTok{ (previous }\SpecialCharTok{\textless{}}\NormalTok{ lower[i]) \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ lower[i]}
+\NormalTok{      action[i] }\OtherTok{\textless{}{-}} \StringTok{"Increase"}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (previous }\SpecialCharTok{\textgreater{}}\NormalTok{ upper[i]) \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ upper[i]}
+\NormalTok{      action[i] }\OtherTok{\textless{}{-}} \StringTok{"Decrease"}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ previous}
+\NormalTok{      action[i] }\OtherTok{\textless{}{-}} \StringTok{"Keep"}
+\NormalTok{    \}}
+\NormalTok{  \}}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{reserve =}\NormalTok{ reserve,}
+    \AttributeTok{lower =}\NormalTok{ lower,}
+    \AttributeTok{upper =}\NormalTok{ upper,}
+    \AttributeTok{action =}\NormalTok{ action}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{performance-measures}{%
+\section{Performance measures}\label{performance-measures}}
+
+The predictive mean is the operational point-estimate comparator. The
+main measures are:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{adequacy regret:} adequacy cost relative to the frictionless
+  minimum;
+\item
+  \textbf{adequacy gain:} adequacy-cost reduction relative to booking
+  the mean;
+\item
+  \textbf{attained percentile:} \(100F_n(R_n)\), averaged over the 52
+  decisions;
+\item
+  \textbf{movement reduction:} reduction in total variation relative to
+  the mean path;
+\item
+  \textbf{inaction frequency:} fraction of exact keeps under the
+  absolute-value rule.
+\end{itemize}
+
+Revision penalties are intentionally excluded from adequacy regret.
+Regret is the adequacy price of stability, not a comparison of
+objectives that use different revision weights.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{total\_movement }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(reserve) \{}
+  \FunctionTok{sum}\NormalTok{(}\FunctionTok{abs}\NormalTok{(}\FunctionTok{diff}\NormalTok{(reserve)))}
+\NormalTok{\}}
+
+\NormalTok{evaluate\_path }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    reserve,}
+\NormalTok{    input,}
+\NormalTok{    configuration,}
+\NormalTok{    policy,}
+    \AttributeTok{action =} \ConstantTok{NULL}\NormalTok{) \{}
+
+\NormalTok{  d }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{decision}
+\NormalTok{  mean\_path }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean}
+\NormalTok{  mean\_path[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+
+\NormalTok{  adequacy\_cost }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}\FunctionTok{expected\_adequacy}\NormalTok{(reserve, input)[d])}
+\NormalTok{  optimum\_cost }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}
+    \FunctionTok{expected\_adequacy}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{frictionless, input)[d]}
+\NormalTok{  )}
+\NormalTok{  mean\_cost }\OtherTok{\textless{}{-}} \FunctionTok{sum}\NormalTok{(}\FunctionTok{expected\_adequacy}\NormalTok{(mean\_path, input)[d])}
+\NormalTok{  attained\_percentile }\OtherTok{\textless{}{-}} \FunctionTok{cdf\_at}\NormalTok{(reserve, input)[d]}
+
+\NormalTok{  movement }\OtherTok{\textless{}{-}} \FunctionTok{total\_movement}\NormalTok{(reserve)}
+\NormalTok{  mean\_movement }\OtherTok{\textless{}{-}} \FunctionTok{total\_movement}\NormalTok{(mean\_path)}
+
+  \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{Configuration =}\NormalTok{ configuration,}
+    \AttributeTok{Policy =}\NormalTok{ policy,}
+    \AttributeTok{RegretPct =} \DecValTok{100} \SpecialCharTok{*}\NormalTok{ (adequacy\_cost }\SpecialCharTok{/}\NormalTok{ optimum\_cost }\SpecialCharTok{{-}} \DecValTok{1}\NormalTok{),}
+    \AttributeTok{GainVsMeanPct =} \DecValTok{100} \SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ adequacy\_cost }\SpecialCharTok{/}\NormalTok{ mean\_cost),}
+    \AttributeTok{AveragePercentile =} \DecValTok{100} \SpecialCharTok{*} \FunctionTok{mean}\NormalTok{(attained\_percentile),}
+    \AttributeTok{ProbabilityDisplacement =}
+      \DecValTok{100} \SpecialCharTok{*} \FunctionTok{mean}\NormalTok{(}\FunctionTok{abs}\NormalTok{(attained\_percentile }\SpecialCharTok{{-}}\NormalTok{ q\_star)),}
+    \AttributeTok{BufferVsMeanPct =}
+      \DecValTok{100} \SpecialCharTok{*} \FunctionTok{mean}\NormalTok{((reserve[d] }\SpecialCharTok{{-}}\NormalTok{ mean\_path[d]) }\SpecialCharTok{/}\NormalTok{ mean\_path[d]),}
+    \AttributeTok{TotalMovement =}\NormalTok{ movement,}
+    \AttributeTok{MovementReductionVsMeanPct =}
+      \DecValTok{100} \SpecialCharTok{*}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ movement }\SpecialCharTok{/}\NormalTok{ mean\_movement),}
+    \AttributeTok{InactionPct =} \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{is.null}\NormalTok{(action)) \{}
+      \ConstantTok{NA\_real\_}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
+      \DecValTok{100} \SpecialCharTok{*} \FunctionTok{mean}\NormalTok{(action[d] }\SpecialCharTok{==} \StringTok{"Keep"}\NormalTok{)}
+\NormalTok{    \},}
+    \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The following block runs the three configurations and retains both paths
+and diagnostics.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{nominal\_paths }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{nominal\_metrics }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+\NormalTok{nominal\_diagnostics }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{()}
+
+\NormalTok{mean\_path }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean}
+\NormalTok{mean\_path[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{nominal\_metrics[[1L]] }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{  mean\_path,}
+\NormalTok{  input,}
+  \StringTok{"Benchmark"}\NormalTok{,}
+  \StringTok{"Predictive mean"}
+\NormalTok{)}
+\NormalTok{nominal\_metrics[[2L]] }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{  input}\SpecialCharTok{$}\NormalTok{frictionless,}
+\NormalTok{  input,}
+  \StringTok{"Benchmark"}\NormalTok{,}
+  \StringTok{"Frictionless reserve"}
+\NormalTok{)}
+
+\ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(scenario\_spec))) \{}
+\NormalTok{  specification }\OtherTok{\textless{}{-}}\NormalTok{ scenario\_spec[j, ]}
+\NormalTok{  quadratic }\OtherTok{\textless{}{-}} \FunctionTok{quadratic\_policy}\NormalTok{(}
+\NormalTok{    specification}\SpecialCharTok{$}\NormalTok{QuadraticLambda,}
+\NormalTok{    input}
+\NormalTok{  )}
+\NormalTok{  absolute }\OtherTok{\textless{}{-}} \FunctionTok{absolute\_policy}\NormalTok{(}
+\NormalTok{    specification}\SpecialCharTok{$}\NormalTok{EtaAbsolute,}
+\NormalTok{    input}
+\NormalTok{  )}
+
+\NormalTok{  nominal\_paths[[specification}\SpecialCharTok{$}\NormalTok{Configuration]] }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{Week =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{week,}
+    \AttributeTok{Mean =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean,}
+    \AttributeTok{Simulated =}\NormalTok{ simulated\_liability,}
+    \AttributeTok{Frictionless =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{frictionless,}
+    \AttributeTok{Quadratic =}\NormalTok{ quadratic}\SpecialCharTok{$}\NormalTok{reserve,}
+    \AttributeTok{Absolute =}\NormalTok{ absolute}\SpecialCharTok{$}\NormalTok{reserve,}
+    \AttributeTok{BandLower =}\NormalTok{ absolute}\SpecialCharTok{$}\NormalTok{lower,}
+    \AttributeTok{BandUpper =}\NormalTok{ absolute}\SpecialCharTok{$}\NormalTok{upper,}
+    \AttributeTok{AbsoluteAction =}\NormalTok{ absolute}\SpecialCharTok{$}\NormalTok{action,}
+    \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{  )}
+
+\NormalTok{  nominal\_metrics[[}\FunctionTok{length}\NormalTok{(nominal\_metrics) }\SpecialCharTok{+}\NormalTok{ 1L]] }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{    quadratic}\SpecialCharTok{$}\NormalTok{reserve,}
+\NormalTok{    input,}
+\NormalTok{    specification}\SpecialCharTok{$}\NormalTok{Configuration,}
+    \StringTok{"Quadratic penalty"}
+\NormalTok{  )}
+\NormalTok{  nominal\_metrics[[}\FunctionTok{length}\NormalTok{(nominal\_metrics) }\SpecialCharTok{+}\NormalTok{ 1L]] }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{    absolute}\SpecialCharTok{$}\NormalTok{reserve,}
+\NormalTok{    input,}
+\NormalTok{    specification}\SpecialCharTok{$}\NormalTok{Configuration,}
+    \StringTok{"Absolute{-}value penalty"}\NormalTok{,}
+    \AttributeTok{action =}\NormalTok{ absolute}\SpecialCharTok{$}\NormalTok{action}
+\NormalTok{  )}
+
+\NormalTok{  nominal\_diagnostics[[j]] }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+    \AttributeTok{Configuration =}\NormalTok{ specification}\SpecialCharTok{$}\NormalTok{Configuration,}
+    \AttributeTok{MaxQuadraticFOCError =}\NormalTok{ quadratic}\SpecialCharTok{$}\NormalTok{max\_foc\_error,}
+    \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{nominal\_metrics }\OtherTok{\textless{}{-}} \FunctionTok{do.call}\NormalTok{(rbind, nominal\_metrics)}
+\NormalTok{nominal\_diagnostics }\OtherTok{\textless{}{-}} \FunctionTok{do.call}\NormalTok{(rbind, nominal\_diagnostics)}
+\FunctionTok{rownames}\NormalTok{(nominal\_metrics) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}lrrl@{}}
+\caption{Revision-cost configurations.}\tabularnewline
+\toprule
+Configuration & Quadratic lambda & Absolute eta & No-action probability
+band \\
+\midrule
+\endfirsthead
+\toprule
+Configuration & Quadratic lambda & Absolute eta & No-action probability
+band \\
+\midrule
+\endhead
+Reactive & 0.25 & 0.20 & {[}0.7000, 0.8000{]} \\
+Balanced & 0.75 & 0.32 & {[}0.6700, 0.8300{]} \\
+Stable & 4.00 & 0.55 & {[}0.6125, 0.8875{]} \\
+\bottomrule
+\end{longtable}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.12}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.20}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.09}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.15}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.14}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.20}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.11}}@{}}
+\caption{Exact known-law performance of the nominal
+policies.}\tabularnewline
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Configuration
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Gain vs mean (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Avg. percentile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Movement reduction (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Inaction (\%)
+\end{minipage} \\
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Configuration
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Gain vs mean (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Avg. percentile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Movement reduction (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Inaction (\%)
+\end{minipage} \\
+\midrule
+\endhead
+Benchmark & Predictive mean & 22.27 & 0.00 & 51.46 & 0.00 & NA \\
+Benchmark & Frictionless reserve & 0.00 & 18.22 & 75.00 & -4.24 & NA \\
+Reactive & Quadratic penalty & 0.09 & 18.15 & 74.84 & 2.30 & NA \\
+Reactive & Absolute-value penalty & 1.03 & 17.38 & 74.04 & 24.50 &
+30.77 \\
+Balanced & Quadratic penalty & 0.56 & 17.76 & 74.55 & 13.56 & NA \\
+Balanced & Absolute-value penalty & 2.41 & 16.24 & 73.68 & 38.23 &
+38.46 \\
+Stable & Quadratic penalty & 4.00 & 14.94 & 73.23 & 51.75 & NA \\
+Stable & Absolute-value penalty & 6.27 & 13.09 & 73.62 & 66.41 &
+57.69 \\
+\bottomrule
+\end{longtable}
+
+The predictive mean occupies an average percentile of 51.46\%, whereas
+the frictionless reserve attains 75\% by construction. Relative to
+booking the mean, the balanced quadratic rule reduces movement by
+13.56\% at only 0.56\% adequacy regret. The balanced absolute-value rule
+reduces movement by 38.23\%, keeps the reserve unchanged in 38.46\% of
+weekly decisions, and incurs 2.41\% regret. The stable specification is
+visibly different: it suppresses more movement and pays a larger
+adequacy cost.
+
+\hypertarget{nominal-reserve-paths}{%
+\subsection{Nominal reserve paths}\label{nominal-reserve-paths}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{plot\_colors }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \AttributeTok{mean =} \StringTok{"\#777777"}\NormalTok{,}
+  \AttributeTok{simulated =} \StringTok{"\#222222"}\NormalTok{,}
+  \AttributeTok{frictionless =} \StringTok{"\#277DA1"}\NormalTok{,}
+  \AttributeTok{quadratic =} \StringTok{"\#E76F51"}\NormalTok{,}
+  \AttributeTok{absolute =} \StringTok{"\#198754"}\NormalTok{,}
+  \AttributeTok{band =} \StringTok{"\#2A9D8F"}
+\NormalTok{)}
+
+\NormalTok{all\_nominal\_values }\OtherTok{\textless{}{-}} \FunctionTok{unlist}\NormalTok{(}\FunctionTok{lapply}\NormalTok{(}
+\NormalTok{  nominal\_paths,}
+  \ControlFlowTok{function}\NormalTok{(x) }\FunctionTok{unlist}\NormalTok{(x[}\FunctionTok{c}\NormalTok{(}
+    \StringTok{"Mean"}\NormalTok{, }\StringTok{"Simulated"}\NormalTok{, }\StringTok{"Frictionless"}\NormalTok{, }\StringTok{"Quadratic"}\NormalTok{,}
+    \StringTok{"Absolute"}\NormalTok{, }\StringTok{"BandLower"}\NormalTok{, }\StringTok{"BandUpper"}
+\NormalTok{  )])}
+\NormalTok{))}
+\NormalTok{nominal\_limits }\OtherTok{\textless{}{-}} \FunctionTok{range}\NormalTok{(all\_nominal\_values)}
+\NormalTok{nominal\_limits }\OtherTok{\textless{}{-}}\NormalTok{ nominal\_limits }\SpecialCharTok{+} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.05}\NormalTok{) }\SpecialCharTok{*} \FunctionTok{diff}\NormalTok{(nominal\_limits)}
+
+\NormalTok{draw\_nominal\_panel }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(configuration) \{}
+\NormalTok{  x }\OtherTok{\textless{}{-}}\NormalTok{ nominal\_paths[[configuration]]}
+  \FunctionTok{plot}\NormalTok{(}
+\NormalTok{    x}\SpecialCharTok{$}\NormalTok{Week,}
+\NormalTok{    x}\SpecialCharTok{$}\NormalTok{Frictionless,}
+    \AttributeTok{type =} \StringTok{"n"}\NormalTok{,}
+    \AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, N),}
+    \AttributeTok{ylim =}\NormalTok{ nominal\_limits,}
+    \AttributeTok{xlab =} \StringTok{"Weekly review n"}\NormalTok{,}
+    \AttributeTok{ylab =} \StringTok{"Reserve or liability"}\NormalTok{,}
+    \AttributeTok{las =} \DecValTok{1}
+\NormalTok{  )}
+  \FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \FunctionTok{pretty}\NormalTok{(nominal\_limits), }\AttributeTok{col =} \StringTok{"\#E4E4E4"}\NormalTok{, }\AttributeTok{lwd =} \FloatTok{0.7}\NormalTok{)}
+  \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =} \FunctionTok{c}\NormalTok{(}\DecValTok{13}\NormalTok{, }\DecValTok{26}\NormalTok{, }\DecValTok{39}\NormalTok{), }\AttributeTok{col =} \StringTok{"\#999999"}\NormalTok{, }\AttributeTok{lty =} \DecValTok{3}\NormalTok{)}
+
+  \FunctionTok{polygon}\NormalTok{(}
+    \FunctionTok{c}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{Week, }\FunctionTok{rev}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{Week)),}
+    \FunctionTok{c}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{BandLower, }\FunctionTok{rev}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{BandUpper)),}
+    \AttributeTok{col =} \FunctionTok{adjustcolor}\NormalTok{(plot\_colors[}\StringTok{"band"}\NormalTok{], }\AttributeTok{alpha.f =} \FloatTok{0.14}\NormalTok{),}
+    \AttributeTok{border =} \ConstantTok{NA}
+\NormalTok{  )}
+  \FunctionTok{lines}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{Week, x}\SpecialCharTok{$}\NormalTok{Simulated, }\AttributeTok{col =}\NormalTok{ plot\_colors[}\StringTok{"simulated"}\NormalTok{])}
+  \FunctionTok{lines}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{Week, x}\SpecialCharTok{$}\NormalTok{Mean, }\AttributeTok{col =}\NormalTok{ plot\_colors[}\StringTok{"mean"}\NormalTok{], }\AttributeTok{lty =} \DecValTok{3}\NormalTok{, }\AttributeTok{lwd =} \FloatTok{1.5}\NormalTok{)}
+  \FunctionTok{lines}\NormalTok{(}
+\NormalTok{    x}\SpecialCharTok{$}\NormalTok{Week,}
+\NormalTok{    x}\SpecialCharTok{$}\NormalTok{Frictionless,}
+    \AttributeTok{col =}\NormalTok{ plot\_colors[}\StringTok{"frictionless"}\NormalTok{],}
+    \AttributeTok{lty =} \DecValTok{2}\NormalTok{,}
+    \AttributeTok{lwd =} \FloatTok{1.8}
+\NormalTok{  )}
+  \FunctionTok{lines}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{Week, x}\SpecialCharTok{$}\NormalTok{Quadratic, }\AttributeTok{col =}\NormalTok{ plot\_colors[}\StringTok{"quadratic"}\NormalTok{], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+  \FunctionTok{lines}\NormalTok{(x}\SpecialCharTok{$}\NormalTok{Week, x}\SpecialCharTok{$}\NormalTok{Absolute, }\AttributeTok{col =}\NormalTok{ plot\_colors[}\StringTok{"absolute"}\NormalTok{], }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+  \FunctionTok{points}\NormalTok{(}\DecValTok{0}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{initial, }\AttributeTok{pch =} \DecValTok{8}\NormalTok{, }\AttributeTok{cex =} \FloatTok{0.85}\NormalTok{)}
+  \FunctionTok{mtext}\NormalTok{(configuration, }\AttributeTok{side =} \DecValTok{3}\NormalTok{, }\AttributeTok{line =} \FloatTok{0.25}\NormalTok{, }\AttributeTok{font =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{C:\Users\Sebastian\Downloads\reservin stochastic control\Numerical study_real data\output\pdf\Simulation_study_report_files/figure-latex/nominal-paths-1} 
+
+}
+
+\caption{Nominal rolling policies under reactive, balanced, and stable revision costs. The shaded region is the absolute-value no-action band; dotted vertical lines mark quarter boundaries. The simulated liability is a visual reference only.}\label{fig:nominal-paths}
+\end{figure}
+
+\hypertarget{kl-robust-counterparts}{%
+\section{KL-robust counterparts}\label{kl-robust-counterparts}}
+
+Robustness is varied independently of the revision penalties. For a
+proposed reserve \(r\), the least-favourable density is proportional to
+
+\[
+\exp\{\theta a_n(L_n;r)\}\,dP_n,
+\qquad
+a_n(L_n;r)=c^o(r-L_n)^+ + c^u(L_n-r)^+.
+\]
+
+The reserve and the exponential tilt are solved jointly subject to the
+binding KL equation. For the quadratic rule, the adverse CDF replaces
+the nominal CDF in the marginal first-order condition. For the
+absolute-value rule, the lower and upper boundaries are each solved with
+their own adverse tilt. The resulting least-favourable distribution is a
+reserve-dependent piecewise exponential tilt of the Gamma reference law;
+it is not itself a single Gamma distribution.
+
+Because Gamma scale is proportional to the mean, the robust calculations
+can be performed with \(L_n/m_n\), \(r/m_n\), and the dimensionless tilt
+\(\theta m_n\). This improves numerical conditioning without changing
+the KL divergence or adverse probabilities.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{logspace\_add }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, y) \{}
+\NormalTok{  z }\OtherTok{\textless{}{-}} \FunctionTok{pmax}\NormalTok{(x, y)}
+\NormalTok{  z }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(}\FunctionTok{exp}\NormalTok{(x }\SpecialCharTok{{-}}\NormalTok{ z) }\SpecialCharTok{+} \FunctionTok{exp}\NormalTok{(y }\SpecialCharTok{{-}}\NormalTok{ z))}
+\NormalTok{\}}
+
+\CommentTok{\# Exact normalizer, adverse CDF, expected loss, and KL divergence for the}
+\CommentTok{\# piecewise exponential tilt of a mean{-}one Gamma reference distribution.}
+\NormalTok{gamma\_tilt\_components }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(reserve\_ratio, tilt, cv) \{}
+\NormalTok{  shape }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{  scale }\OtherTok{\textless{}{-}}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{  lower\_rate }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{+}\NormalTok{ scale }\SpecialCharTok{*}\NormalTok{ tilt }\SpecialCharTok{*}\NormalTok{ c\_over}
+\NormalTok{  upper\_rate }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ scale }\SpecialCharTok{*}\NormalTok{ tilt }\SpecialCharTok{*}\NormalTok{ c\_under}
+
+  \ControlFlowTok{if}\NormalTok{ (upper\_rate }\SpecialCharTok{\textless{}=} \DecValTok{0}\NormalTok{) \{}
+    \FunctionTok{stop}\NormalTok{(}\StringTok{"The tilt has crossed the Gamma moment boundary."}\NormalTok{)}
+\NormalTok{  \}}
+
+\NormalTok{  lower\_scale }\OtherTok{\textless{}{-}}\NormalTok{ scale }\SpecialCharTok{/}\NormalTok{ lower\_rate}
+\NormalTok{  upper\_scale }\OtherTok{\textless{}{-}}\NormalTok{ scale }\SpecialCharTok{/}\NormalTok{ upper\_rate}
+\NormalTok{  log\_lower\_probability }\OtherTok{\textless{}{-}} \FunctionTok{pgamma}\NormalTok{(}
+\NormalTok{    reserve\_ratio,}
+    \AttributeTok{shape =}\NormalTok{ shape,}
+    \AttributeTok{scale =}\NormalTok{ lower\_scale,}
+    \AttributeTok{log.p =} \ConstantTok{TRUE}
+\NormalTok{  )}
+\NormalTok{  log\_upper\_probability }\OtherTok{\textless{}{-}} \FunctionTok{pgamma}\NormalTok{(}
+\NormalTok{    reserve\_ratio,}
+    \AttributeTok{shape =}\NormalTok{ shape,}
+    \AttributeTok{scale =}\NormalTok{ upper\_scale,}
+    \AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{,}
+    \AttributeTok{log.p =} \ConstantTok{TRUE}
+\NormalTok{  )}
+
+\NormalTok{  log\_z\_lower }\OtherTok{\textless{}{-}}
+\NormalTok{    tilt }\SpecialCharTok{*}\NormalTok{ c\_over }\SpecialCharTok{*}\NormalTok{ reserve\_ratio }\SpecialCharTok{{-}}
+\NormalTok{    shape }\SpecialCharTok{*} \FunctionTok{log}\NormalTok{(lower\_rate) }\SpecialCharTok{+}
+\NormalTok{    log\_lower\_probability}
+\NormalTok{  log\_z\_upper }\OtherTok{\textless{}{-}}
+    \SpecialCharTok{{-}}\NormalTok{tilt }\SpecialCharTok{*}\NormalTok{ c\_under }\SpecialCharTok{*}\NormalTok{ reserve\_ratio }\SpecialCharTok{{-}}
+\NormalTok{    shape }\SpecialCharTok{*} \FunctionTok{log}\NormalTok{(upper\_rate) }\SpecialCharTok{+}
+\NormalTok{    log\_upper\_probability}
+\NormalTok{  log\_normalizer }\OtherTok{\textless{}{-}} \FunctionTok{logspace\_add}\NormalTok{(log\_z\_lower, log\_z\_upper)}
+\NormalTok{  adverse\_cdf }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(log\_z\_lower }\SpecialCharTok{{-}}\NormalTok{ log\_normalizer)}
+
+\NormalTok{  lower\_first\_ratio }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}
+    \FunctionTok{pgamma}\NormalTok{(}
+\NormalTok{      reserve\_ratio,}
+      \AttributeTok{shape =}\NormalTok{ shape }\SpecialCharTok{+} \DecValTok{1}\NormalTok{,}
+      \AttributeTok{scale =}\NormalTok{ lower\_scale,}
+      \AttributeTok{log.p =} \ConstantTok{TRUE}
+\NormalTok{    ) }\SpecialCharTok{{-}}\NormalTok{ log\_lower\_probability}
+\NormalTok{  )}
+\NormalTok{  upper\_first\_ratio }\OtherTok{\textless{}{-}} \FunctionTok{exp}\NormalTok{(}
+    \FunctionTok{pgamma}\NormalTok{(}
+\NormalTok{      reserve\_ratio,}
+      \AttributeTok{shape =}\NormalTok{ shape }\SpecialCharTok{+} \DecValTok{1}\NormalTok{,}
+      \AttributeTok{scale =}\NormalTok{ upper\_scale,}
+      \AttributeTok{lower.tail =} \ConstantTok{FALSE}\NormalTok{,}
+      \AttributeTok{log.p =} \ConstantTok{TRUE}
+\NormalTok{    ) }\SpecialCharTok{{-}}\NormalTok{ log\_upper\_probability}
+\NormalTok{  )}
+
+\NormalTok{  lower\_conditional\_mean }\OtherTok{\textless{}{-}}\NormalTok{ lower\_first\_ratio }\SpecialCharTok{/}\NormalTok{ lower\_rate}
+\NormalTok{  upper\_conditional\_mean }\OtherTok{\textless{}{-}}\NormalTok{ upper\_first\_ratio }\SpecialCharTok{/}\NormalTok{ upper\_rate}
+\NormalTok{  expected\_loss\_ratio }\OtherTok{\textless{}{-}}
+\NormalTok{    adverse\_cdf }\SpecialCharTok{*}\NormalTok{ c\_over }\SpecialCharTok{*}
+      \FunctionTok{pmax}\NormalTok{(reserve\_ratio }\SpecialCharTok{{-}}\NormalTok{ lower\_conditional\_mean, }\DecValTok{0}\NormalTok{) }\SpecialCharTok{+}
+\NormalTok{    (}\DecValTok{1} \SpecialCharTok{{-}}\NormalTok{ adverse\_cdf) }\SpecialCharTok{*}\NormalTok{ c\_under }\SpecialCharTok{*}
+      \FunctionTok{pmax}\NormalTok{(upper\_conditional\_mean }\SpecialCharTok{{-}}\NormalTok{ reserve\_ratio, }\DecValTok{0}\NormalTok{)}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{log\_normalizer =}\NormalTok{ log\_normalizer,}
+    \AttributeTok{adverse\_cdf =}\NormalTok{ adverse\_cdf,}
+    \AttributeTok{kl =}\NormalTok{ tilt }\SpecialCharTok{*}\NormalTok{ expected\_loss\_ratio }\SpecialCharTok{{-}}\NormalTok{ log\_normalizer,}
+    \AttributeTok{right\_tail\_scale\_ratio =} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ upper\_rate}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The inner solver below finds the tilt that exhausts a given KL radius.
+The outer solver then finds the reserve whose adverse CDF equals the
+required marginal probability.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{solve\_tilt\_for\_kl }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(reserve\_ratio, cv, epsilon) \{}
+  \ControlFlowTok{if}\NormalTok{ (epsilon }\SpecialCharTok{\textless{}=} \DecValTok{0}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(}\DecValTok{0}\NormalTok{)}
+\NormalTok{  \}}
+
+\NormalTok{  tilt\_limit }\OtherTok{\textless{}{-}} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ (cv}\SpecialCharTok{\^{}}\DecValTok{2} \SpecialCharTok{*}\NormalTok{ c\_under)}
+\NormalTok{  high }\OtherTok{\textless{}{-}}\NormalTok{ tilt\_limit }\SpecialCharTok{/} \DecValTok{256}
+
+  \ControlFlowTok{while}\NormalTok{ (}
+    \FunctionTok{gamma\_tilt\_components}\NormalTok{(reserve\_ratio, high, cv)}\SpecialCharTok{$}\NormalTok{kl }\SpecialCharTok{\textless{}}\NormalTok{ epsilon }\SpecialCharTok{\&\&}
+\NormalTok{      high }\SpecialCharTok{\textless{}} \FloatTok{0.95} \SpecialCharTok{*}\NormalTok{ tilt\_limit}
+\NormalTok{  ) \{}
+\NormalTok{    high }\OtherTok{\textless{}{-}} \FunctionTok{min}\NormalTok{(}\FloatTok{1.7} \SpecialCharTok{*}\NormalTok{ high, }\FloatTok{0.95} \SpecialCharTok{*}\NormalTok{ tilt\_limit)}
+\NormalTok{  \}}
+
+  \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{gamma\_tilt\_components}\NormalTok{(reserve\_ratio, high, cv)}\SpecialCharTok{$}\NormalTok{kl }\SpecialCharTok{\textless{}}\NormalTok{ epsilon) \{}
+\NormalTok{    high }\OtherTok{\textless{}{-}}\NormalTok{ (}\DecValTok{1} \SpecialCharTok{{-}} \FloatTok{1e{-}10}\NormalTok{) }\SpecialCharTok{*}\NormalTok{ tilt\_limit}
+\NormalTok{  \}}
+
+  \FunctionTok{uniroot}\NormalTok{(}
+    \ControlFlowTok{function}\NormalTok{(tilt) \{}
+      \FunctionTok{gamma\_tilt\_components}\NormalTok{(reserve\_ratio, tilt, cv)}\SpecialCharTok{$}\NormalTok{kl }\SpecialCharTok{{-}}\NormalTok{ epsilon}
+\NormalTok{    \},}
+    \AttributeTok{interval =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, high),}
+    \AttributeTok{tol =} \FloatTok{1e{-}11}
+\NormalTok{  )}\SpecialCharTok{$}\NormalTok{root}
+\NormalTok{\}}
+
+\NormalTok{robust\_probability\_reserve\_ratio }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    cv,}
+\NormalTok{    epsilon,}
+\NormalTok{    target\_probability) \{}
+
+  \ControlFlowTok{if}\NormalTok{ (epsilon }\SpecialCharTok{\textless{}=} \DecValTok{0}\NormalTok{) \{}
+    \FunctionTok{return}\NormalTok{(}\FunctionTok{qgamma}\NormalTok{(}
+\NormalTok{      target\_probability,}
+      \AttributeTok{shape =} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{,}
+      \AttributeTok{scale =}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{    ))}
+\NormalTok{  \}}
+
+\NormalTok{  residual }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(reserve\_ratio) \{}
+\NormalTok{    tilt }\OtherTok{\textless{}{-}} \FunctionTok{solve\_tilt\_for\_kl}\NormalTok{(reserve\_ratio, cv, epsilon)}
+    \FunctionTok{gamma\_tilt\_components}\NormalTok{(reserve\_ratio, tilt, cv)}\SpecialCharTok{$}\NormalTok{adverse\_cdf }\SpecialCharTok{{-}}
+\NormalTok{      target\_probability}
+\NormalTok{  \}}
+
+\NormalTok{  bracket }\OtherTok{\textless{}{-}} \FunctionTok{qgamma}\NormalTok{(}
+    \FunctionTok{c}\NormalTok{(}\FloatTok{1e{-}7}\NormalTok{, }\DecValTok{1} \SpecialCharTok{{-}} \FloatTok{1e{-}9}\NormalTok{),}
+    \AttributeTok{shape =} \DecValTok{1} \SpecialCharTok{/}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{,}
+    \AttributeTok{scale =}\NormalTok{ cv}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{  )}
+  \FunctionTok{uniroot}\NormalTok{(residual, }\AttributeTok{interval =}\NormalTok{ bracket, }\AttributeTok{tol =} \FloatTok{1e{-}10}\NormalTok{)}\SpecialCharTok{$}\NormalTok{root}
+\NormalTok{\}}
+
+\NormalTok{robust\_probability\_path }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    input,}
+\NormalTok{    epsilon,}
+\NormalTok{    target\_probability) \{}
+
+\NormalTok{  ratio }\OtherTok{\textless{}{-}} \FunctionTok{mapply}\NormalTok{(}
+\NormalTok{    robust\_probability\_reserve\_ratio,}
+    \AttributeTok{cv =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{cv,}
+    \AttributeTok{MoreArgs =} \FunctionTok{list}\NormalTok{(}
+      \AttributeTok{epsilon =}\NormalTok{ epsilon,}
+      \AttributeTok{target\_probability =}\NormalTok{ target\_probability}
+\NormalTok{    )}
+\NormalTok{  )}
+\NormalTok{  tilt }\OtherTok{\textless{}{-}} \FunctionTok{mapply}\NormalTok{(}
+\NormalTok{    solve\_tilt\_for\_kl,}
+    \AttributeTok{reserve\_ratio =}\NormalTok{ ratio,}
+    \AttributeTok{cv =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{cv,}
+    \AttributeTok{MoreArgs =} \FunctionTok{list}\NormalTok{(}\AttributeTok{epsilon =}\NormalTok{ epsilon)}
+\NormalTok{  )}
+\NormalTok{  components }\OtherTok{\textless{}{-}} \FunctionTok{Map}\NormalTok{(}
+\NormalTok{    gamma\_tilt\_components,}
+    \AttributeTok{reserve\_ratio =}\NormalTok{ ratio,}
+    \AttributeTok{tilt =}\NormalTok{ tilt,}
+    \AttributeTok{cv =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{cv}
+\NormalTok{  )}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{reserve =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean }\SpecialCharTok{*}\NormalTok{ ratio,}
+    \AttributeTok{ratio =}\NormalTok{ ratio,}
+    \AttributeTok{tilt =}\NormalTok{ tilt,}
+    \AttributeTok{adverse\_cdf =} \FunctionTok{vapply}\NormalTok{(}
+\NormalTok{      components,}
+      \ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{adverse\_cdf,}
+      \FunctionTok{numeric}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{    ),}
+    \AttributeTok{kl =} \FunctionTok{vapply}\NormalTok{(components, }\ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{kl, }\FunctionTok{numeric}\NormalTok{(}\DecValTok{1}\NormalTok{)),}
+    \AttributeTok{right\_tail\_scale\_ratio =} \FunctionTok{vapply}\NormalTok{(}
+\NormalTok{      components,}
+      \ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{right\_tail\_scale\_ratio,}
+      \FunctionTok{numeric}\NormalTok{(}\DecValTok{1}\NormalTok{)}
+\NormalTok{    )}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+The quadratic and absolute-value robust policies reuse the same two
+equations. Only their marginal probability conditions differ.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{robust\_quadratic\_policy }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(}
+\NormalTok{    lambda,}
+\NormalTok{    input,}
+\NormalTok{    epsilon,}
+\NormalTok{    robust\_frictionless) \{}
+
+\NormalTok{  eta }\OtherTok{\textless{}{-}}\NormalTok{ lambda }\SpecialCharTok{*}\NormalTok{ C\_cost }\SpecialCharTok{*}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{  reserve }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+\NormalTok{  reserve[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{  foc\_error }\OtherTok{\textless{}{-}}\NormalTok{ kl\_error }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{decision) \{}
+\NormalTok{    previous }\OtherTok{\textless{}{-}}\NormalTok{ reserve[i }\SpecialCharTok{{-}}\NormalTok{ 1L]}
+\NormalTok{    robust\_target }\OtherTok{\textless{}{-}}\NormalTok{ robust\_frictionless}\SpecialCharTok{$}\NormalTok{reserve[i]}
+
+\NormalTok{    residual }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(r) \{}
+\NormalTok{      ratio }\OtherTok{\textless{}{-}}\NormalTok{ r }\SpecialCharTok{/}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean[i]}
+\NormalTok{      tilt }\OtherTok{\textless{}{-}} \FunctionTok{solve\_tilt\_for\_kl}\NormalTok{(ratio, input}\SpecialCharTok{$}\NormalTok{cv[i], epsilon)}
+\NormalTok{      adverse\_cdf }\OtherTok{\textless{}{-}} \FunctionTok{gamma\_tilt\_components}\NormalTok{(}
+\NormalTok{        ratio,}
+\NormalTok{        tilt,}
+\NormalTok{        input}\SpecialCharTok{$}\NormalTok{cv[i]}
+\NormalTok{      )}\SpecialCharTok{$}\NormalTok{adverse\_cdf}
+
+\NormalTok{      C\_cost }\SpecialCharTok{*}\NormalTok{ adverse\_cdf }\SpecialCharTok{{-}}\NormalTok{ c\_under }\SpecialCharTok{+}
+        \DecValTok{2} \SpecialCharTok{*}\NormalTok{ eta }\SpecialCharTok{*}\NormalTok{ (r }\SpecialCharTok{{-}}\NormalTok{ previous) }\SpecialCharTok{/}\NormalTok{ previous}\SpecialCharTok{\^{}}\DecValTok{2}
+\NormalTok{    \}}
+
+\NormalTok{    bracket }\OtherTok{\textless{}{-}} \FunctionTok{sort}\NormalTok{(}\FunctionTok{c}\NormalTok{(previous, robust\_target))}
+    \ControlFlowTok{if}\NormalTok{ (}\FunctionTok{diff}\NormalTok{(bracket) }\SpecialCharTok{\textless{}=} \FloatTok{1e{-}12} \SpecialCharTok{*} \FunctionTok{max}\NormalTok{(}\DecValTok{1}\NormalTok{, bracket[2L])) \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ robust\_target}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}} \FunctionTok{uniroot}\NormalTok{(}
+\NormalTok{        residual,}
+        \AttributeTok{interval =}\NormalTok{ bracket,}
+        \AttributeTok{tol =} \FloatTok{1e{-}10}
+\NormalTok{      )}\SpecialCharTok{$}\NormalTok{root}
+\NormalTok{    \}}
+
+\NormalTok{    ratio }\OtherTok{\textless{}{-}}\NormalTok{ reserve[i] }\SpecialCharTok{/}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{mean[i]}
+\NormalTok{    tilt }\OtherTok{\textless{}{-}} \FunctionTok{solve\_tilt\_for\_kl}\NormalTok{(ratio, input}\SpecialCharTok{$}\NormalTok{cv[i], epsilon)}
+\NormalTok{    component }\OtherTok{\textless{}{-}} \FunctionTok{gamma\_tilt\_components}\NormalTok{(ratio, tilt, input}\SpecialCharTok{$}\NormalTok{cv[i])}
+\NormalTok{    foc\_error[i] }\OtherTok{\textless{}{-}} \FunctionTok{residual}\NormalTok{(reserve[i])}
+\NormalTok{    kl\_error[i] }\OtherTok{\textless{}{-}}\NormalTok{ component}\SpecialCharTok{$}\NormalTok{kl }\SpecialCharTok{{-}}\NormalTok{ epsilon}
+\NormalTok{  \}}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{reserve =}\NormalTok{ reserve,}
+    \AttributeTok{eta =}\NormalTok{ eta,}
+    \AttributeTok{max\_foc\_error =} \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(foc\_error[input}\SpecialCharTok{$}\NormalTok{decision])),}
+    \AttributeTok{max\_kl\_error =} \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(kl\_error[input}\SpecialCharTok{$}\NormalTok{decision]))}
+\NormalTok{  )}
+\NormalTok{\}}
+
+\NormalTok{robust\_absolute\_policy }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(eta, input, epsilon) \{}
+\NormalTok{  lower\_probability }\OtherTok{\textless{}{-}}\NormalTok{ q\_star }\SpecialCharTok{{-}}\NormalTok{ eta }\SpecialCharTok{/}\NormalTok{ C\_cost}
+\NormalTok{  upper\_probability }\OtherTok{\textless{}{-}}\NormalTok{ q\_star }\SpecialCharTok{+}\NormalTok{ eta }\SpecialCharTok{/}\NormalTok{ C\_cost}
+\NormalTok{  lower\_solution }\OtherTok{\textless{}{-}} \FunctionTok{robust\_probability\_path}\NormalTok{(}
+\NormalTok{    input,}
+\NormalTok{    epsilon,}
+\NormalTok{    lower\_probability}
+\NormalTok{  )}
+\NormalTok{  upper\_solution }\OtherTok{\textless{}{-}} \FunctionTok{robust\_probability\_path}\NormalTok{(}
+\NormalTok{    input,}
+\NormalTok{    epsilon,}
+\NormalTok{    upper\_probability}
+\NormalTok{  )}
+
+\NormalTok{  reserve }\OtherTok{\textless{}{-}} \FunctionTok{numeric}\NormalTok{(}\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+\NormalTok{  reserve[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+\NormalTok{  action }\OtherTok{\textless{}{-}} \FunctionTok{rep}\NormalTok{(}\StringTok{"Initial"}\NormalTok{, }\FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week))}
+
+  \ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{decision) \{}
+\NormalTok{    previous }\OtherTok{\textless{}{-}}\NormalTok{ reserve[i }\SpecialCharTok{{-}}\NormalTok{ 1L]}
+\NormalTok{    lower }\OtherTok{\textless{}{-}}\NormalTok{ lower\_solution}\SpecialCharTok{$}\NormalTok{reserve[i]}
+\NormalTok{    upper }\OtherTok{\textless{}{-}}\NormalTok{ upper\_solution}\SpecialCharTok{$}\NormalTok{reserve[i]}
+
+    \ControlFlowTok{if}\NormalTok{ (previous }\SpecialCharTok{\textless{}}\NormalTok{ lower) \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ lower}
+\NormalTok{      action[i] }\OtherTok{\textless{}{-}} \StringTok{"Increase"}
+\NormalTok{    \} }\ControlFlowTok{else} \ControlFlowTok{if}\NormalTok{ (previous }\SpecialCharTok{\textgreater{}}\NormalTok{ upper) \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ upper}
+\NormalTok{      action[i] }\OtherTok{\textless{}{-}} \StringTok{"Decrease"}
+\NormalTok{    \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{      reserve[i] }\OtherTok{\textless{}{-}}\NormalTok{ previous}
+\NormalTok{      action[i] }\OtherTok{\textless{}{-}} \StringTok{"Keep"}
+\NormalTok{    \}}
+\NormalTok{  \}}
+
+  \FunctionTok{list}\NormalTok{(}
+    \AttributeTok{reserve =}\NormalTok{ reserve,}
+    \AttributeTok{lower =}\NormalTok{ lower\_solution}\SpecialCharTok{$}\NormalTok{reserve,}
+    \AttributeTok{upper =}\NormalTok{ upper\_solution}\SpecialCharTok{$}\NormalTok{reserve,}
+    \AttributeTok{action =}\NormalTok{ action,}
+    \AttributeTok{lower\_solution =}\NormalTok{ lower\_solution,}
+    \AttributeTok{upper\_solution =}\NormalTok{ upper\_solution,}
+    \AttributeTok{max\_kl\_error =} \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(}\FunctionTok{c}\NormalTok{(}
+\NormalTok{      lower\_solution}\SpecialCharTok{$}\NormalTok{kl[input}\SpecialCharTok{$}\NormalTok{decision] }\SpecialCharTok{{-}}\NormalTok{ epsilon,}
+\NormalTok{      upper\_solution}\SpecialCharTok{$}\NormalTok{kl[input}\SpecialCharTok{$}\NormalTok{decision] }\SpecialCharTok{{-}}\NormalTok{ epsilon}
+\NormalTok{    ))),}
+    \AttributeTok{max\_probability\_error =} \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(}\FunctionTok{c}\NormalTok{(}
+\NormalTok{      lower\_solution}\SpecialCharTok{$}\NormalTok{adverse\_cdf[input}\SpecialCharTok{$}\NormalTok{decision] }\SpecialCharTok{{-}}\NormalTok{ lower\_probability,}
+\NormalTok{      upper\_solution}\SpecialCharTok{$}\NormalTok{adverse\_cdf[input}\SpecialCharTok{$}\NormalTok{decision] }\SpecialCharTok{{-}}\NormalTok{ upper\_probability}
+\NormalTok{    )))}
+\NormalTok{  )}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+We now hold the balanced revision parameters fixed and solve all three
+policies at each KL radius.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{balanced\_spec }\OtherTok{\textless{}{-}} \FunctionTok{subset}\NormalTok{(}
+\NormalTok{  scenario\_spec,}
+\NormalTok{  Configuration }\SpecialCharTok{==} \StringTok{"Balanced"}
+\NormalTok{)}
+\NormalTok{balanced\_nominal }\OtherTok{\textless{}{-}}\NormalTok{ nominal\_paths[[}\StringTok{"Balanced"}\NormalTok{]]}
+
+\NormalTok{robust\_results }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(}
+  \FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(ambiguity\_spec)),}
+  \ControlFlowTok{function}\NormalTok{(j) \{}
+\NormalTok{    epsilon }\OtherTok{\textless{}{-}}\NormalTok{ ambiguity\_spec}\SpecialCharTok{$}\NormalTok{Epsilon[j]}
+\NormalTok{    robust\_frictionless }\OtherTok{\textless{}{-}} \FunctionTok{robust\_probability\_path}\NormalTok{(}
+\NormalTok{      input,}
+\NormalTok{      epsilon,}
+\NormalTok{      q\_star}
+\NormalTok{    )}
+\NormalTok{    robust\_frictionless}\SpecialCharTok{$}\NormalTok{reserve[1L] }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{initial}
+
+\NormalTok{    robust\_quadratic }\OtherTok{\textless{}{-}} \FunctionTok{robust\_quadratic\_policy}\NormalTok{(}
+\NormalTok{      balanced\_spec}\SpecialCharTok{$}\NormalTok{QuadraticLambda,}
+\NormalTok{      input,}
+\NormalTok{      epsilon,}
+\NormalTok{      robust\_frictionless}
+\NormalTok{    )}
+\NormalTok{    robust\_absolute }\OtherTok{\textless{}{-}} \FunctionTok{robust\_absolute\_policy}\NormalTok{(}
+\NormalTok{      balanced\_spec}\SpecialCharTok{$}\NormalTok{EtaAbsolute,}
+\NormalTok{      input,}
+\NormalTok{      epsilon}
+\NormalTok{    )}
+
+\NormalTok{    policies }\OtherTok{\textless{}{-}} \FunctionTok{list}\NormalTok{(}
+      \StringTok{"Frictionless reserve"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+        \AttributeTok{reserve =}\NormalTok{ robust\_frictionless}\SpecialCharTok{$}\NormalTok{reserve,}
+        \AttributeTok{nominal =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{frictionless,}
+        \AttributeTok{action =} \ConstantTok{NULL}
+\NormalTok{      ),}
+      \StringTok{"Quadratic penalty"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+        \AttributeTok{reserve =}\NormalTok{ robust\_quadratic}\SpecialCharTok{$}\NormalTok{reserve,}
+        \AttributeTok{nominal =}\NormalTok{ balanced\_nominal}\SpecialCharTok{$}\NormalTok{Quadratic,}
+        \AttributeTok{action =} \ConstantTok{NULL}
+\NormalTok{      ),}
+      \StringTok{"Absolute{-}value penalty"} \OtherTok{=} \FunctionTok{list}\NormalTok{(}
+        \AttributeTok{reserve =}\NormalTok{ robust\_absolute}\SpecialCharTok{$}\NormalTok{reserve,}
+        \AttributeTok{nominal =}\NormalTok{ balanced\_nominal}\SpecialCharTok{$}\NormalTok{Absolute,}
+        \AttributeTok{action =}\NormalTok{ robust\_absolute}\SpecialCharTok{$}\NormalTok{action}
+\NormalTok{      )}
+\NormalTok{    )}
+
+\NormalTok{    metrics }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(}\FunctionTok{names}\NormalTok{(policies), }\ControlFlowTok{function}\NormalTok{(policy\_name) \{}
+\NormalTok{      object }\OtherTok{\textless{}{-}}\NormalTok{ policies[[policy\_name]]}
+\NormalTok{      row }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{        object}\SpecialCharTok{$}\NormalTok{reserve,}
+\NormalTok{        input,}
+\NormalTok{        ambiguity\_spec}\SpecialCharTok{$}\NormalTok{Ambiguity[j],}
+\NormalTok{        policy\_name,}
+        \AttributeTok{action =}\NormalTok{ object}\SpecialCharTok{$}\NormalTok{action}
+\NormalTok{      )}
+\NormalTok{      row}\SpecialCharTok{$}\NormalTok{Epsilon }\OtherTok{\textless{}{-}}\NormalTok{ epsilon}
+\NormalTok{      row}\SpecialCharTok{$}\NormalTok{UpliftVsNominalPct }\OtherTok{\textless{}{-}} \DecValTok{100} \SpecialCharTok{*} \FunctionTok{mean}\NormalTok{(}
+\NormalTok{        object}\SpecialCharTok{$}\NormalTok{reserve[input}\SpecialCharTok{$}\NormalTok{decision] }\SpecialCharTok{/}
+\NormalTok{          object}\SpecialCharTok{$}\NormalTok{nominal[input}\SpecialCharTok{$}\NormalTok{decision] }\SpecialCharTok{{-}} \DecValTok{1}
+\NormalTok{      )}
+\NormalTok{      row}
+\NormalTok{    \})}
+
+\NormalTok{    d }\OtherTok{\textless{}{-}}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{decision}
+\NormalTok{    diagnostics }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+      \AttributeTok{Ambiguity =}\NormalTok{ ambiguity\_spec}\SpecialCharTok{$}\NormalTok{Ambiguity[j],}
+      \AttributeTok{Epsilon =}\NormalTok{ epsilon,}
+      \AttributeTok{FrictionlessKLError =} \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(}
+\NormalTok{        robust\_frictionless}\SpecialCharTok{$}\NormalTok{kl[d] }\SpecialCharTok{{-}}\NormalTok{ epsilon}
+\NormalTok{      )),}
+      \AttributeTok{FrictionlessProbabilityError =} \FunctionTok{max}\NormalTok{(}\FunctionTok{abs}\NormalTok{(}
+\NormalTok{        robust\_frictionless}\SpecialCharTok{$}\NormalTok{adverse\_cdf[d] }\SpecialCharTok{{-}}\NormalTok{ q\_star}
+\NormalTok{      )),}
+      \AttributeTok{QuadraticKLError =}\NormalTok{ robust\_quadratic}\SpecialCharTok{$}\NormalTok{max\_kl\_error,}
+      \AttributeTok{QuadraticFOCError =}\NormalTok{ robust\_quadratic}\SpecialCharTok{$}\NormalTok{max\_foc\_error,}
+      \AttributeTok{AbsoluteKLError =}\NormalTok{ robust\_absolute}\SpecialCharTok{$}\NormalTok{max\_kl\_error,}
+      \AttributeTok{AbsoluteProbabilityError =}
+\NormalTok{        robust\_absolute}\SpecialCharTok{$}\NormalTok{max\_probability\_error,}
+      \AttributeTok{stringsAsFactors =} \ConstantTok{FALSE}
+\NormalTok{    )}
+
+    \FunctionTok{list}\NormalTok{(}
+      \AttributeTok{frictionless =}\NormalTok{ robust\_frictionless,}
+      \AttributeTok{quadratic =}\NormalTok{ robust\_quadratic,}
+      \AttributeTok{absolute =}\NormalTok{ robust\_absolute,}
+      \AttributeTok{metrics =} \FunctionTok{do.call}\NormalTok{(rbind, metrics),}
+      \AttributeTok{diagnostics =}\NormalTok{ diagnostics}
+\NormalTok{    )}
+\NormalTok{  \}}
+\NormalTok{)}
+\FunctionTok{names}\NormalTok{(robust\_results) }\OtherTok{\textless{}{-}}\NormalTok{ ambiguity\_spec}\SpecialCharTok{$}\NormalTok{Ambiguity}
+
+\NormalTok{robust\_metrics }\OtherTok{\textless{}{-}} \FunctionTok{do.call}\NormalTok{(}
+\NormalTok{  rbind,}
+  \FunctionTok{lapply}\NormalTok{(robust\_results, }\ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{metrics)}
+\NormalTok{)}
+\NormalTok{robust\_diagnostics }\OtherTok{\textless{}{-}} \FunctionTok{do.call}\NormalTok{(}
+\NormalTok{  rbind,}
+  \FunctionTok{lapply}\NormalTok{(robust\_results, }\ControlFlowTok{function}\NormalTok{(x) x}\SpecialCharTok{$}\NormalTok{diagnostics)}
+\NormalTok{)}
+\FunctionTok{rownames}\NormalTok{(robust\_metrics) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\FunctionTok{rownames}\NormalTok{(robust\_diagnostics) }\OtherTok{\textless{}{-}} \ConstantTok{NULL}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.10}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.08}}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.23}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.11}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.11}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.16}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 12\tabcolsep) * \real{0.23}}@{}}
+\caption{KL-robust policies with balanced revision costs held
+fixed.}\tabularnewline
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Ambiguity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Epsilon
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Uplift (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Avg. percentile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Movement reduction (\%)
+\end{minipage} \\
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+Ambiguity
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Epsilon
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Policy
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Uplift (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Avg. percentile
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Movement reduction (\%)
+\end{minipage} \\
+\midrule
+\endhead
+Small & 0.005 & Frictionless reserve & 0.51 & 0.11 & 76.46 & -5.60 \\
+Small & 0.005 & Quadratic penalty & 0.50 & 0.57 & 76.02 & 11.79 \\
+Small & 0.005 & Absolute-value penalty & 0.47 & 2.09 & 75.02 & 36.00 \\
+Moderate & 0.080 & Frictionless reserve & 2.04 & 1.78 & 80.54 & -9.88 \\
+Moderate & 0.080 & Quadratic penalty & 2.03 & 1.96 & 80.14 & 7.10 \\
+Moderate & 0.080 & Absolute-value penalty & 1.93 & 2.63 & 78.89 &
+30.83 \\
+Large & 0.250 & Frictionless reserve & 3.63 & 5.39 & 84.24 & -14.30 \\
+Large & 0.250 & Quadratic penalty & 3.62 & 5.36 & 83.88 & 2.59 \\
+Large & 0.250 & Absolute-value penalty & 3.54 & 5.43 & 82.82 & 25.17 \\
+\bottomrule
+\end{longtable}
+
+Increasing \(\varepsilon\) raises the reserve level but does not
+mechanically alter responsiveness. At the largest radius, mean uplift
+relative to the corresponding nominal policies is approximately
+3.5--3.6\%. The attained nominal percentile rises because the robust law
+allocates more weight to costly shortfall outcomes. The quadratic and
+absolute-value policies still display gradual adjustment and inaction,
+respectively.
+
+\hypertarget{robust-reserve-paths}{%
+\subsection{Robust reserve paths}\label{robust-reserve-paths}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{robust\_colors }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \AttributeTok{Small =} \StringTok{"\#56B4E9"}\NormalTok{,}
+  \AttributeTok{Moderate =} \StringTok{"\#6F42C1"}\NormalTok{,}
+  \AttributeTok{Large =} \StringTok{"\#B2182B"}
+\NormalTok{)}
+
+\NormalTok{draw\_robust\_panel }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(policy\_key, panel\_title) \{}
+\NormalTok{  nominal\_series }\OtherTok{\textless{}{-}} \ControlFlowTok{switch}\NormalTok{(}
+\NormalTok{    policy\_key,}
+    \AttributeTok{frictionless =}\NormalTok{ input}\SpecialCharTok{$}\NormalTok{frictionless,}
+    \AttributeTok{quadratic =}\NormalTok{ balanced\_nominal}\SpecialCharTok{$}\NormalTok{Quadratic,}
+    \AttributeTok{absolute =}\NormalTok{ balanced\_nominal}\SpecialCharTok{$}\NormalTok{Absolute}
+\NormalTok{  )}
+\NormalTok{  robust\_series }\OtherTok{\textless{}{-}} \FunctionTok{lapply}\NormalTok{(robust\_results, }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{    x[[policy\_key]]}\SpecialCharTok{$}\NormalTok{reserve}
+\NormalTok{  \})}
+\NormalTok{  limits }\OtherTok{\textless{}{-}} \FunctionTok{range}\NormalTok{(}
+\NormalTok{    input}\SpecialCharTok{$}\NormalTok{mean,}
+\NormalTok{    simulated\_liability,}
+\NormalTok{    nominal\_series,}
+    \FunctionTok{unlist}\NormalTok{(robust\_series)}
+\NormalTok{  )}
+\NormalTok{  limits }\OtherTok{\textless{}{-}}\NormalTok{ limits }\SpecialCharTok{+} \FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\FloatTok{0.05}\NormalTok{, }\FloatTok{0.05}\NormalTok{) }\SpecialCharTok{*} \FunctionTok{diff}\NormalTok{(limits)}
+
+  \FunctionTok{plot}\NormalTok{(}
+\NormalTok{    input}\SpecialCharTok{$}\NormalTok{week,}
+\NormalTok{    nominal\_series,}
+    \AttributeTok{type =} \StringTok{"n"}\NormalTok{,}
+    \AttributeTok{xlim =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, N),}
+    \AttributeTok{ylim =}\NormalTok{ limits,}
+    \AttributeTok{xlab =} \StringTok{"Weekly review n"}\NormalTok{,}
+    \AttributeTok{ylab =} \StringTok{"Reserve or liability"}\NormalTok{,}
+    \AttributeTok{las =} \DecValTok{1}
+\NormalTok{  )}
+  \FunctionTok{abline}\NormalTok{(}\AttributeTok{h =} \FunctionTok{pretty}\NormalTok{(limits), }\AttributeTok{col =} \StringTok{"\#E4E4E4"}\NormalTok{, }\AttributeTok{lwd =} \FloatTok{0.7}\NormalTok{)}
+  \FunctionTok{abline}\NormalTok{(}\AttributeTok{v =} \FunctionTok{c}\NormalTok{(}\DecValTok{13}\NormalTok{, }\DecValTok{26}\NormalTok{, }\DecValTok{39}\NormalTok{), }\AttributeTok{col =} \StringTok{"\#999999"}\NormalTok{, }\AttributeTok{lty =} \DecValTok{3}\NormalTok{)}
+  \FunctionTok{lines}\NormalTok{(}
+\NormalTok{    input}\SpecialCharTok{$}\NormalTok{week,}
+\NormalTok{    simulated\_liability,}
+    \AttributeTok{col =} \FunctionTok{adjustcolor}\NormalTok{(}\StringTok{"\#222222"}\NormalTok{, }\FloatTok{0.35}\NormalTok{)}
+\NormalTok{  )}
+  \FunctionTok{lines}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week, input}\SpecialCharTok{$}\NormalTok{mean, }\AttributeTok{col =} \StringTok{"\#777777"}\NormalTok{, }\AttributeTok{lty =} \DecValTok{3}\NormalTok{)}
+  \FunctionTok{lines}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week, nominal\_series, }\AttributeTok{col =} \StringTok{"\#277DA1"}\NormalTok{, }\AttributeTok{lty =} \DecValTok{2}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)}
+
+  \ControlFlowTok{for}\NormalTok{ (ambiguity }\ControlFlowTok{in} \FunctionTok{names}\NormalTok{(robust\_results)) \{}
+    \FunctionTok{lines}\NormalTok{(}
+\NormalTok{      input}\SpecialCharTok{$}\NormalTok{week,}
+\NormalTok{      robust\_results[[ambiguity]][[policy\_key]]}\SpecialCharTok{$}\NormalTok{reserve,}
+      \AttributeTok{col =}\NormalTok{ robust\_colors[ambiguity],}
+      \AttributeTok{lwd =} \DecValTok{2}
+\NormalTok{    )}
+\NormalTok{  \}}
+  \FunctionTok{points}\NormalTok{(}\DecValTok{0}\NormalTok{, input}\SpecialCharTok{$}\NormalTok{initial, }\AttributeTok{pch =} \DecValTok{8}\NormalTok{, }\AttributeTok{cex =} \FloatTok{0.85}\NormalTok{)}
+  \FunctionTok{mtext}\NormalTok{(panel\_title, }\AttributeTok{side =} \DecValTok{3}\NormalTok{, }\AttributeTok{line =} \FloatTok{0.25}\NormalTok{, }\AttributeTok{font =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{C:\Users\Sebastian\Downloads\reservin stochastic control\Numerical study_real data\output\pdf\Simulation_study_report_files/figure-latex/robust-paths-1} 
+
+}
+
+\caption{KL sensitivity by policy. Balanced revision costs are fixed in every panel; only the ambiguity radius changes.}\label{fig:robust-paths}
+\end{figure}
+
+The line colors in the robust figure use the following fixed mapping.
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{C:\Users\Sebastian\Downloads\reservin stochastic control\Numerical study_real data\output\pdf\Simulation_study_report_files/figure-latex/robust-legend-1} 
+
+}
+
+\caption{Legend for the KL sensitivity figure.}\label{fig:robust-legend}
+\end{figure}
+
+\hypertarget{predictive-dispersion-sensitivity}{%
+\section{Predictive-dispersion
+sensitivity}\label{predictive-dispersion-sensitivity}}
+
+To test whether the qualitative comparison is an artifact of the chosen
+CV sequence, the balanced policies are rerun at \(0.75v_n\), \(v_n\),
+and \(1.25v_n\), with the mean sequence unchanged.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cv\_sensitivity }\OtherTok{\textless{}{-}} \FunctionTok{do.call}\NormalTok{(}
+\NormalTok{  rbind,}
+  \FunctionTok{lapply}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\FloatTok{0.75}\NormalTok{, }\DecValTok{1}\NormalTok{, }\FloatTok{1.25}\NormalTok{), }\ControlFlowTok{function}\NormalTok{(multiplier) \{}
+\NormalTok{    local\_input }\OtherTok{\textless{}{-}} \FunctionTok{make\_input}\NormalTok{(multiplier)}
+\NormalTok{    local\_input}\SpecialCharTok{$}\NormalTok{initial }\OtherTok{\textless{}{-}}\NormalTok{ local\_input}\SpecialCharTok{$}\NormalTok{frictionless[1L]}
+\NormalTok{    quadratic }\OtherTok{\textless{}{-}} \FunctionTok{quadratic\_policy}\NormalTok{(}
+\NormalTok{      balanced\_spec}\SpecialCharTok{$}\NormalTok{QuadraticLambda,}
+\NormalTok{      local\_input}
+\NormalTok{    )}
+\NormalTok{    absolute }\OtherTok{\textless{}{-}} \FunctionTok{absolute\_policy}\NormalTok{(}
+\NormalTok{      balanced\_spec}\SpecialCharTok{$}\NormalTok{EtaAbsolute,}
+\NormalTok{      local\_input}
+\NormalTok{    )}
+
+\NormalTok{    quadratic\_metrics }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{      quadratic}\SpecialCharTok{$}\NormalTok{reserve,}
+\NormalTok{      local\_input,}
+      \StringTok{"Balanced"}\NormalTok{,}
+      \StringTok{"Quadratic penalty"}
+\NormalTok{    )}
+\NormalTok{    absolute\_metrics }\OtherTok{\textless{}{-}} \FunctionTok{evaluate\_path}\NormalTok{(}
+\NormalTok{      absolute}\SpecialCharTok{$}\NormalTok{reserve,}
+\NormalTok{      local\_input,}
+      \StringTok{"Balanced"}\NormalTok{,}
+      \StringTok{"Absolute{-}value penalty"}\NormalTok{,}
+      \AttributeTok{action =}\NormalTok{ absolute}\SpecialCharTok{$}\NormalTok{action}
+\NormalTok{    )}
+
+    \FunctionTok{data.frame}\NormalTok{(}
+      \AttributeTok{CVMultiplier =}\NormalTok{ multiplier,}
+      \AttributeTok{QuadraticRegret =}\NormalTok{ quadratic\_metrics}\SpecialCharTok{$}\NormalTok{RegretPct,}
+      \AttributeTok{AbsoluteRegret =}\NormalTok{ absolute\_metrics}\SpecialCharTok{$}\NormalTok{RegretPct,}
+      \AttributeTok{QuadraticMovementReduction =}
+\NormalTok{        quadratic\_metrics}\SpecialCharTok{$}\NormalTok{MovementReductionVsMeanPct,}
+      \AttributeTok{AbsoluteInaction =}\NormalTok{ absolute\_metrics}\SpecialCharTok{$}\NormalTok{InactionPct}
+\NormalTok{    )}
+\NormalTok{  \})}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.13}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.19}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.18}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.30}}
+  >{\raggedleft\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.20}}@{}}
+\caption{Balanced-policy sensitivity to predictive
+dispersion.}\tabularnewline
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedleft
+CV multiplier
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Quadratic regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Absolute regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Quadratic movement reduction (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Absolute inaction (\%)
+\end{minipage} \\
+\midrule
+\endfirsthead
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedleft
+CV multiplier
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Quadratic regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Absolute regret (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Quadratic movement reduction (\%)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Absolute inaction (\%)
+\end{minipage} \\
+\midrule
+\endhead
+0.75 & 0.63 & 2.50 & 11.01 & 34.62 \\
+1.00 & 0.56 & 2.41 & 13.56 & 38.46 \\
+1.25 & 0.51 & 2.37 & 15.97 & 40.38 \\
+\bottomrule
+\end{longtable}
+
+The ordering is unchanged. Higher predictive dispersion modestly
+increases smoothing and widens the absolute-value no-action region,
+while adequacy regret remains close to its baseline value.
+
+\hypertarget{numerical-verification}{%
+\section{Numerical verification}\label{numerical-verification}}
+
+Every reported policy is checked against the equation that defines it.
+The largest residual across the nominal and robust calculations is
+reported below; values near machine precision confirm that the figures
+are not artifacts of loose numerical tolerances.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{diagnostic\_values }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+\NormalTok{  nominal\_diagnostics}\SpecialCharTok{$}\NormalTok{MaxQuadraticFOCError,}
+  \FunctionTok{unlist}\NormalTok{(robust\_diagnostics[}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)])}
+\NormalTok{)}
+
+\NormalTok{diagnostic\_summary }\OtherTok{\textless{}{-}} \FunctionTok{data.frame}\NormalTok{(}
+  \AttributeTok{Check =} \FunctionTok{c}\NormalTok{(}
+    \StringTok{"Largest nominal quadratic FOC residual"}\NormalTok{,}
+    \StringTok{"Largest robust{-}system residual"}
+\NormalTok{  ),}
+  \AttributeTok{MaximumAbsoluteError =} \FunctionTok{c}\NormalTok{(}
+    \FunctionTok{max}\NormalTok{(nominal\_diagnostics}\SpecialCharTok{$}\NormalTok{MaxQuadraticFOCError),}
+    \FunctionTok{max}\NormalTok{(}\FunctionTok{unlist}\NormalTok{(robust\_diagnostics[}\SpecialCharTok{{-}}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{)]))}
+\NormalTok{  )}
+\NormalTok{)}
+
+\FunctionTok{stopifnot}\NormalTok{(}
+  \FunctionTok{all}\NormalTok{(}\FunctionTok{is.finite}\NormalTok{(diagnostic\_values)),}
+  \FunctionTok{max}\NormalTok{(diagnostic\_values) }\SpecialCharTok{\textless{}} \FloatTok{1e{-}8}\NormalTok{,}
+  \FunctionTok{all}\NormalTok{(}\FunctionTok{diff}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week) }\SpecialCharTok{==} \DecValTok{1}\NormalTok{),}
+  \FunctionTok{length}\NormalTok{(input}\SpecialCharTok{$}\NormalTok{week) }\SpecialCharTok{==}\NormalTok{ N }\SpecialCharTok{+}\NormalTok{ 1L,}
+  \FunctionTok{all}\NormalTok{(}\FunctionTok{vapply}\NormalTok{(nominal\_paths, nrow, }\FunctionTok{integer}\NormalTok{(}\DecValTok{1}\NormalTok{)) }\SpecialCharTok{==}\NormalTok{ N }\SpecialCharTok{+}\NormalTok{ 1L)}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}ll@{}}
+\caption{Numerical residual checks.}\tabularnewline
+\toprule
+Check & MaximumAbsoluteError \\
+\midrule
+\endfirsthead
+\toprule
+Check & MaximumAbsoluteError \\
+\midrule
+\endhead
+Largest nominal quadratic FOC residual & 1.11e-12 \\
+Largest robust-system residual & 1.20e-10 \\
+\bottomrule
+\end{longtable}
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+The controlled experiment isolates the decision layer from model
+estimation. The frictionless rule converts asymmetric adequacy costs
+into an economically motivated reserve buffer. The quadratic penalty
+exchanges a small amount of adequacy for gradual adjustment, while the
+absolute-value penalty creates literal inaction periods and discrete
+interventions. Moving from reactive to stable revision costs strengthens
+both effects in the expected direction.
+
+The balanced configuration is useful as a middle reference because it
+remains responsive to the middle-year reversal and late trend while
+reducing revision activity. It is not a universal recommendation: a
+practitioner should calibrate the cost asymmetry and revision penalties
+to its own capital, liquidity, governance, and implementation
+environment.
+
+KL robustness answers a different question. It raises the reserve
+against predictive model uncertainty while leaving the selected
+revision-cost regime fixed. The simulation therefore confirms the
+intended separation: robustness changes the predictive measure or
+reserve level, whereas revision penalties control how the booked reserve
+responds from one review to the next.
+
+\begin{verbatim}
+#> Report generated with R version 4.1.1 (2021-08-10).
+\end{verbatim}
+
+\end{document}
