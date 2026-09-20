@@ -1,7 +1,9 @@
 ---
 title: "Discrete Rolling Reserve Policies"
 subtitle: "A self-contained simulation study"
-author: "Sebastian E. Carbone-Vergara"
+author: |
+  Sebastián Calcetero Vanegas  
+  Independent Researcher, Toronto, Ontario, Canada
 date: "September 2026"
 output:
   html_document:
@@ -54,6 +56,43 @@ options(width = 92, scipen = 4, digits = 5)
 
 # Purpose and design
 
+The paper treats reserve selection as a decision problem layered on a predictive
+reserving model. At weekly review $n$, that model supplies the conditional law
+$F_n$ of the outstanding liability $L_n$. Given the previously carried reserve
+$R_{n-1}$, the insurer selects the new reserve from the rolling objective
+
+\[
+R_n^*
+=\underset{r>0}{\operatorname{arg\,min}}\left\{
+c_n^o\,\mathbb E_n[(r-L_n)^+]
++c_n^u\,\mathbb E_n[(L_n-r)^+]
++\Psi_n(r,R_{n-1})
+\right\}.
+\]
+
+Here, $c_n^o$ and $c_n^u$ are the reduced-form marginal costs of excess reserve
+and reserve shortfall, respectively, while $\Psi_n$ assigns a cost to revising
+the reserve. The paper studies three choices:
+
+\[
+\begin{aligned}
+\text{frictionless:}\quad
+&\Psi_n(r,R_{n-1})=0,\\
+\text{quadratic proportional:}\quad
+&\Psi_n(r,R_{n-1})=
+\eta_n\left(\frac{r-R_{n-1}}{R_{n-1}}\right)^2,\\
+\text{absolute value:}\quad
+&\Psi_n(r,R_{n-1})=\eta_n|r-R_{n-1}|.
+\end{aligned}
+\]
+
+The first choice produces the conditional quantile
+$F_n^{-1}\{c_n^u/(c_n^o+c_n^u)\}$. The quadratic policy moves gradually toward
+that contemporaneous benchmark, whereas the absolute-value policy leaves the
+reserve unchanged inside an endogenous no-action band and moves it to the
+nearest boundary otherwise. The code below implements these objectives at each
+discrete review date.
+
 This report reproduces the controlled simulation study for the discrete rolling
 reserve policies. It is deliberately self-contained: the predictive
 distributions, policy functions, robust solvers, performance measures, figures,
@@ -97,8 +136,8 @@ q_star <- c_under / C_cost
 # not an estimated optimum or a universally recommended calibration.
 scenario_spec <- data.frame(
   Configuration = c("Reactive", "Balanced", "Stable"),
-  QuadraticLambda = c(0.25, 0.75, 4.00),
-  EtaAbsolute = c(0.20, 0.32, 0.55),
+  QuadraticLambda = c(0.10, 1.50, 5.00),
+  EtaAbsolute = c(0.10, 0.42, 0.62),
   stringsAsFactors = FALSE
 )
 
@@ -124,6 +163,44 @@ $n=0,\ldots,52$. The four quarters create distinct environments: a relatively
 stable opening, an oscillatory transition, a pronounced middle-year reversal,
 and a persistent late increase. The policies never interpolate between weekly
 reviews.
+
+For transparency, the deterministic functions used to construct this sequence
+are stated explicitly. Define
+
+\[
+S(x;a,b)=\frac12\left\{1+\tanh\left(\frac{x-a}{b}\right)\right\},
+\qquad
+w(x)=S(x;0.27,0.035)\{1-S(x;0.66,0.05)\}.
+\]
+
+The predictive mean is
+
+\[
+\begin{aligned}
+m(x)={}&100+8\{1-S(x;0.22,0.07)\}+1.2\sin(14\pi x)\\
+&+0.7\cos(24\pi x+0.25)+0.45\sin(34\pi x+0.60)\\
+&+w(x)\left[8.5\sin\{8\pi(x-0.25)\}
++3.2\sin\{18\pi(x-0.25)\}\right]\\
+&+3.2S(x;0.62,0.045)\{1-S(x;0.78,0.05)\}\\
+&+24S(x;0.73,0.05)\frac{x-0.73}{0.27},
+\end{aligned}
+\]
+
+and its coefficient of variation is
+
+\[
+\begin{aligned}
+v(x)=\max\Big\{0.045,\;&0.060
++0.100S(x;0.25,0.035)\{1-S(x;0.66,0.05)\}\\
+&+0.030S(x;0.72,0.05)
++0.008\sin(10\pi x+0.4)
++0.003\cos(18\pi x)\Big\}.
+\end{aligned}
+\]
+
+The experiment evaluates $m_n=m(x_n)$ and $v_n=v(x_n)$ at
+$x_n=n/N$, so these formulas define the complete Gamma predictive law at every
+weekly review.
 
 ```{r predictive-environment-functions}
 # Smooth transition used to construct the deterministic mean and CV sequences.
@@ -583,12 +660,13 @@ movement and pays a larger adequacy cost.
 
 ```{r nominal-plot-helpers}
 plot_colors <- c(
-  mean = "#777777",
-  simulated = "#222222",
+  mean = "#7A7A7A",
+  simulated = "#1A1A1A",
   frictionless = "#277DA1",
   quadratic = "#E76F51",
   absolute = "#198754",
-  band = "#2A9D8F"
+  band = "#2A9D8F",
+  initial = "#6F42C1"
 )
 
 all_nominal_values <- unlist(lapply(
@@ -622,28 +700,85 @@ draw_nominal_panel <- function(configuration) {
     col = adjustcolor(plot_colors["band"], alpha.f = 0.14),
     border = NA
   )
-  lines(x$Week, x$Simulated, col = plot_colors["simulated"])
-  lines(x$Week, x$Mean, col = plot_colors["mean"], lty = 3, lwd = 1.5)
+  lines(
+    x$Week, x$Simulated,
+    col = plot_colors["simulated"], lwd = 2.6
+  )
+  points(
+    x$Week, x$Simulated,
+    col = plot_colors["simulated"], pch = 16, cex = 0.58
+  )
+  lines(x$Week, x$Mean, col = plot_colors["mean"], lty = 3, lwd = 1.8)
+  points(
+    x$Week, x$Mean,
+    col = plot_colors["mean"], pch = 1, cex = 0.62
+  )
   lines(
     x$Week,
     x$Frictionless,
     col = plot_colors["frictionless"],
     lty = 2,
-    lwd = 1.8
+    lwd = 2.2
   )
-  lines(x$Week, x$Quadratic, col = plot_colors["quadratic"], lwd = 2)
-  lines(x$Week, x$Absolute, col = plot_colors["absolute"], lwd = 2)
-  points(0, input$initial, pch = 8, cex = 0.85)
+  points(
+    x$Week, x$Frictionless,
+    col = plot_colors["frictionless"], pch = 17, cex = 0.66
+  )
+  lines(x$Week, x$Quadratic, col = plot_colors["quadratic"], lwd = 2.3)
+  points(
+    x$Week, x$Quadratic,
+    col = plot_colors["quadratic"], pch = 15, cex = 0.62
+  )
+  lines(x$Week, x$Absolute, col = plot_colors["absolute"], lwd = 2.4)
+  points(
+    x$Week, x$Absolute,
+    col = plot_colors["absolute"], pch = 18, cex = 0.74
+  )
+  points(
+    0, input$initial, pch = 8,
+    col = plot_colors["initial"], lwd = 2, cex = 1.05
+  )
+  keep <- x$AbsoluteAction == "Keep" & x$Week > 0
+  if (any(keep)) {
+    points(
+      x$Week[keep], x$Absolute[keep],
+      pch = 21, bg = "white", col = plot_colors["absolute"],
+      lwd = 1.8, cex = 0.92
+    )
+  }
   mtext(configuration, side = 3, line = 0.25, font = 2)
 }
 ```
 
-```{r nominal-paths, echo=FALSE, fig.width=8.5, fig.height=9.2, fig.cap="Nominal rolling policies under reactive, balanced, and stable revision costs. The shaded region is the absolute-value no-action band; dotted vertical lines mark quarter boundaries. The simulated liability is a visual reference only."}
+```{r nominal-paths, echo=FALSE, fig.width=8.5, fig.height=9.2, fig.cap="Nominal rolling policies under reactive, balanced, and stable revision costs. The shaded region is the absolute-value no-action band; white-centered green circles mark exact inaction decisions; dotted vertical lines mark quarter boundaries. The simulated liability is a visual reference only."}
 old_par <- par(no.readonly = TRUE)
-par(mfrow = c(3, 1), mar = c(3.2, 4.2, 1.6, 0.8), mgp = c(2.3, 0.7, 0))
+layout(matrix(1:4, ncol = 1), heights = c(1, 1, 1, 0.12))
+par(mar = c(3.2, 4.2, 1.6, 0.8), mgp = c(2.3, 0.7, 0))
 for (configuration in scenario_spec$Configuration) {
   draw_nominal_panel(configuration)
 }
+par(mar = c(0, 0, 0, 0))
+plot.new()
+legend(
+  "center",
+  ncol = 3,
+  bty = "n",
+  cex = 0.78,
+  legend = c(
+    "Simulated liability", "Conditional mean",
+    "Cost-implied frictionless reserve", "Quadratic penalty",
+    "Absolute-value penalty", "No-action band"
+  ),
+  col = c(
+    plot_colors[c(
+      "simulated", "mean", "frictionless", "quadratic", "absolute"
+    )],
+    adjustcolor(plot_colors["band"], alpha.f = 0.45)
+  ),
+  lty = c(1, 3, 2, 1, 1, 1),
+  lwd = c(2.6, 1.8, 2.2, 2.3, 2.4, 7),
+  pch = c(16, 1, 17, 15, 18, NA)
+)
 par(old_par)
 ```
 
@@ -1132,6 +1267,18 @@ draw_robust_panel <- function(policy_key, panel_title) {
   robust_series <- lapply(robust_results, function(x) {
     x[[policy_key]]$reserve
   })
+  policy_color <- switch(
+    policy_key,
+    frictionless = plot_colors["frictionless"],
+    quadratic = plot_colors["quadratic"],
+    absolute = plot_colors["absolute"]
+  )
+  policy_pch <- switch(
+    policy_key,
+    frictionless = 17,
+    quadratic = 15,
+    absolute = 18
+  )
   limits <- range(
     input$mean,
     simulated_liability,
@@ -1155,10 +1302,31 @@ draw_robust_panel <- function(policy_key, panel_title) {
   lines(
     input$week,
     simulated_liability,
-    col = adjustcolor("#222222", 0.35)
+    col = plot_colors["simulated"], lwd = 2.6
   )
-  lines(input$week, input$mean, col = "#777777", lty = 3)
-  lines(input$week, nominal_series, col = "#277DA1", lty = 2, lwd = 2)
+  points(
+    input$week, simulated_liability,
+    col = plot_colors["simulated"], pch = 16, cex = 0.58
+  )
+  lines(input$week, input$mean, col = plot_colors["mean"], lty = 3, lwd = 1.8)
+  points(
+    input$week, input$mean,
+    col = plot_colors["mean"], pch = 1, cex = 0.62
+  )
+  lines(input$week, nominal_series, col = policy_color, lty = 2, lwd = 2.2)
+  points(
+    input$week, nominal_series,
+    col = policy_color, pch = policy_pch, cex = 0.66
+  )
+  if (policy_key == "absolute") {
+    nominal_keep <- balanced_nominal$AbsoluteAction == "Keep" &
+      input$week > 0
+    points(
+      input$week[nominal_keep], nominal_series[nominal_keep],
+      pch = 21, bg = "white", col = plot_colors["absolute"],
+      lwd = 1.6, cex = 0.84
+    )
+  }
 
   for (ambiguity in names(robust_results)) {
     lines(
@@ -1167,13 +1335,31 @@ draw_robust_panel <- function(policy_key, panel_title) {
       col = robust_colors[ambiguity],
       lwd = 2
     )
+    points(
+      input$week,
+      robust_results[[ambiguity]][[policy_key]]$reserve,
+      col = robust_colors[ambiguity], pch = 15, cex = 0.52
+    )
+    if (policy_key == "absolute") {
+      robust_keep <- robust_results[[ambiguity]]$absolute$action == "Keep" &
+        input$week > 0
+      points(
+        input$week[robust_keep],
+        robust_results[[ambiguity]]$absolute$reserve[robust_keep],
+        pch = 21, bg = "white", col = robust_colors[ambiguity],
+        lwd = 1.5, cex = 0.80
+      )
+    }
   }
-  points(0, input$initial, pch = 8, cex = 0.85)
+  points(
+    0, input$initial, pch = 8,
+    col = plot_colors["initial"], lwd = 2, cex = 1.05
+  )
   mtext(panel_title, side = 3, line = 0.25, font = 2)
 }
 ```
 
-```{r robust-paths, echo=FALSE, fig.width=8.5, fig.height=9.2, fig.cap="KL sensitivity by policy. Balanced revision costs are fixed in every panel; only the ambiguity radius changes."}
+```{r robust-paths, echo=FALSE, fig.width=8.5, fig.height=9.2, fig.cap="KL sensitivity by policy. Balanced revision costs are fixed in every panel; only the ambiguity radius changes. White-centered circles mark exact inaction decisions in the absolute-value panel."}
 old_par <- par(no.readonly = TRUE)
 layout(matrix(1:4, ncol = 1), heights = c(1, 1, 1, 0.12))
 par(mar = c(3.2, 4.2, 1.6, 0.8), mgp = c(2.3, 0.7, 0))
@@ -1188,14 +1374,20 @@ legend(
   bty = "n",
   cex = 0.82,
   legend = c(
-    "Nominal (epsilon = 0)",
+    "Nominal frictionless",
+    "Nominal quadratic",
+    "Nominal absolute value",
     paste0(
       "epsilon = ",
       formatC(ambiguity_spec$Epsilon, format = "f", digits = 3)
     )
   ),
-  col = c("#277DA1", robust_colors),
-  lty = c(2, 1, 1, 1),
+  col = c(
+    plot_colors[c("frictionless", "quadratic", "absolute")],
+    robust_colors
+  ),
+  lty = c(2, 2, 2, 1, 1, 1),
+  pch = c(17, 15, 18, 15, 15, 15),
   lwd = 2
 )
 par(old_par)
